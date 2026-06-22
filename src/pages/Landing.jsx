@@ -351,7 +351,6 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
     { id: 'about', label: 'About' },
     { id: 'packages', label: 'Packages' },
     { id: 'plan', label: 'Compensation' },
-    { id: 'roadmap', label: 'Roadmap' },
     { id: 'faq', label: 'FAQ' },
     { id: 'contact', label: 'Contact' }
   ];
@@ -400,13 +399,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
     { q: 'Can I unstake capital before the contract expires?', a: 'Early unstaking is possible with a 10% penalty fee. All remaining ROI cycles are forfeited upon manual unstake.' },
   ];
 
-  /* ── ROADMAP ── */
-  const roadmap = [
-    { phase: 'Phase 1 — System Launch', period: 'Q1 2026', desc: 'Smart MLM contracts, binary genealogies, CapTok balance systems, and admin portal release.', done: true },
-    { phase: 'Phase 2 — Advanced Calculators', period: 'Q2 2026', desc: 'Automated daily ROI cron payouts, binary matcher triggers, and enhanced dashboards.', done: true },
-    { phase: 'Phase 3 — IMX Exchange Listing', period: 'Q4 2026', desc: 'Listing IMX token on global DEX/CEX platforms with external swap gateways.', done: false },
-    { phase: 'Phase 4 — Platform DAO Governance', period: '2027', desc: 'Transition backoffice settings to staker DAO voting decisions and decentralised control.', done: false },
-  ];
+
 
   return (
     <div style={{ minHeight: '100vh', background: 'radial-gradient(ellipse at top right, #0e0a04 0%, #030303 65%)', color: 'white', fontFamily: 'var(--font-sans)', overflowX: 'hidden', position: 'relative' }}>
@@ -1028,48 +1021,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
           </motion.div>
         </section>
 
-        {/* ═══════════ ROADMAP ═══════════ */}
-        <section id="roadmap" style={{ padding: '60px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-          <div style={{ maxWidth: '820px', margin: '0 auto' }}>
-            <SectionHeader badge="Timeline" title="Project" highlight="Roadmap" />
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0', position: 'relative' }}>
-              {/* vertical line */}
-              <div style={{ position: 'absolute', left: '19px', top: 0, bottom: 0, width: '2px', background: 'linear-gradient(to bottom, var(--gold-primary), rgba(212,175,55,0.1))', borderRadius: '2px' }} />
-
-              {roadmap.map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.6 }}
-                  whileHover={{ x: 8, transition: { duration: 0.2 } }}
-                  style={{ display: 'flex', gap: '28px', paddingLeft: '8px', marginBottom: '32px', position: 'relative' }}
-                >
-                  {/* dot */}
-                  <motion.div
-                    animate={{ boxShadow: item.done ? ['0 0 6px rgba(212,175,55,0.5)', '0 0 16px rgba(212,175,55,0.9)', '0 0 6px rgba(212,175,55,0.5)'] : [] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    style={{ width: '24px', height: '24px', borderRadius: '50%', background: item.done ? 'var(--gold-primary)' : 'rgba(255,255,255,0.1)', border: item.done ? '2px solid var(--gold-primary)' : '2px solid rgba(255,255,255,0.15)', flexShrink: 0, marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}
-                  >
-                    {item.done && <CheckCircle size={12} style={{ color: '#0a0800' }} />}
-                  </motion.div>
-
-                  <div style={{ flex: 1, padding: '20px 24px', background: 'rgba(255,255,255,0.02)', border: `1px solid ${item.done ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                      <h4 style={{ fontSize: '15px', fontWeight: 700, color: item.done ? 'var(--gold-primary)' : 'var(--text-white)' }}>{item.phase}</h4>
-                      <span style={{ fontSize: '11px', padding: '3px 10px', borderRadius: '12px', fontWeight: 700, background: item.done ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)', color: item.done ? '#34d399' : 'var(--text-muted)' }}>
-                        {item.done ? '✓ Completed' : item.period}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '13px', color: 'var(--text-grey)', lineHeight: 1.55 }}>{item.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ═══════════ FAQ ═══════════ */}
         <section id="faq" style={{ padding: '60px 40px', maxWidth: '820px', margin: '0 auto', width: '100%' }}>
