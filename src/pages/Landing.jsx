@@ -278,7 +278,7 @@ function SectionHeader({ badge, title, highlight }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      style={{ textAlign: 'center', marginBottom: '60px' }}
+      style={{ textAlign: 'center', marginBottom: '35px' }}
     >
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
@@ -487,7 +487,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
           onMouseEnter={() => setIsMouseOverHero(true)}
           onMouseLeave={() => setIsMouseOverHero(false)}
           style={{
-            padding: '140px 40px 110px',
+            padding: '85px 40px 65px',
             maxWidth: '1300px',
             margin: '0 auto',
             width: '100%',
@@ -822,7 +822,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
             transition={{ duration: 0.7, delay: 0.2 }}
             style={{
               display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1px', marginTop: '90px',
+              gap: '1px', marginTop: '50px',
               background: 'rgba(255,255,255,0.05)',
               border: '1px solid rgba(255,255,255,0.07)',
               borderRadius: '20px', overflow: 'hidden',
@@ -846,7 +846,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ ABOUT SECTION ═══════════ */}
-        <section id="about" style={{ padding: '100px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+        <section id="about" style={{ padding: '60px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <SectionHeader badge="Who We Are" title="About Aurex" highlight="Capital Platform" />
             
@@ -889,7 +889,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ HOW IT WORKS ═══════════ */}
-        <section id="how-it-works" style={{ padding: '100px 40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        <section id="how-it-works" style={{ padding: '60px 40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           <SectionHeader badge="Simple Process" title="How It" highlight="Operates" />
 
           <motion.div
@@ -925,7 +925,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ PACKAGES SECTION ═══════════ */}
-        <section id="packages" style={{ padding: '100px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+        <section id="packages" style={{ padding: '60px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <SectionHeader badge="Choose Your Plan" title="Staking Investment" highlight="Packages" />
 
@@ -997,7 +997,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ COMPENSATION PLAN ═══════════ */}
-        <section id="plan" style={{ padding: '100px 40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        <section id="plan" style={{ padding: '60px 40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           <SectionHeader badge="MLM Yields System" title="Compensation" highlight="Plan Benefits" />
 
           <motion.div
@@ -1029,7 +1029,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ ROADMAP ═══════════ */}
-        <section id="roadmap" style={{ padding: '100px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+        <section id="roadmap" style={{ padding: '60px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
           <div style={{ maxWidth: '820px', margin: '0 auto' }}>
             <SectionHeader badge="Timeline" title="Project" highlight="Roadmap" />
 
@@ -1072,7 +1072,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ FAQ ═══════════ */}
-        <section id="faq" style={{ padding: '100px 40px', maxWidth: '820px', margin: '0 auto', width: '100%' }}>
+        <section id="faq" style={{ padding: '60px 40px', maxWidth: '820px', margin: '0 auto', width: '100%' }}>
           <SectionHeader badge="Have Questions?" title="Frequently Asked" highlight="Questions" />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1117,7 +1117,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </section>
 
         {/* ═══════════ CONTACT SECTION ═══════════ */}
-        <section id="contact" style={{ padding: '100px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+        <section id="contact" style={{ padding: '60px 40px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
           <div style={{ maxWidth: '960px', margin: '0 auto' }}>
             <SectionHeader badge="Get In Touch" title="Contact" highlight="Support" />
 
