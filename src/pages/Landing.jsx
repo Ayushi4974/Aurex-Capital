@@ -64,6 +64,150 @@ function FloatingOrbs() {
   );
 }
 
+/* ─────────────────────────── Particle Constellation Canvas ─────────────────────────── */
+function ParticleConstellation() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const particles = [];
+    const maxParticles = 65;
+    const mouse = { x: null, y: null, radius: 160 };
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.45;
+        this.vy = (Math.random() - 0.5) * 0.45;
+        this.radius = Math.random() * 2 + 1;
+        this.baseAlpha = Math.random() * 0.4 + 0.15;
+        this.alpha = this.baseAlpha;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Bounce off bounds
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+
+        // Mouse interaction
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < mouse.radius) {
+            const force = (mouse.radius - dist) / mouse.radius;
+            // pull slightly
+            this.x += (dx / dist) * force * 0.4;
+            this.y += (dy / dist) * force * 0.4;
+            this.alpha = Math.min(0.9, this.baseAlpha + force * 0.5);
+          } else {
+            this.alpha = this.baseAlpha;
+          }
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
+        ctx.shadowBlur = this.radius * 2;
+        ctx.shadowColor = '#d4af37';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // Initialize particles
+    for (let i = 0; i < maxParticles; i++) {
+      particles.push(new Particle());
+    }
+
+    const drawConnections = () => {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < 130) {
+            const alpha = (1 - dist / 130) * 0.18;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(212, 175, 55, ${alpha})`;
+            ctx.lineWidth = 0.85;
+            ctx.stroke();
+          }
+        }
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
+      });
+      drawConnections();
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.x = null;
+      mouse.y = null;
+    };
+
+    const handleResize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('resize', handleResize);
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }}
+    />
+  );
+}
+
+
 /* ─────────────────────────── Tilt Card ─────────────────────────── */
 function TiltCard({ children, style, className }) {
   const ref = useRef(null);
@@ -172,6 +316,17 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const { scrollY } = useScroll();
   const headerBg = useTransform(scrollY, [0, 100], ['rgba(5,5,5,0)', 'rgba(5,5,5,0.95)']);
+
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isMouseOverHero, setIsMouseOverHero] = useState(false);
+
+  const handleHeroMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
 
   const toggleFaq = (i) => setFaqOpen(prev => ({ ...prev, [i]: !prev[i] }));
   const scrollToSection = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -326,8 +481,112 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
       <main style={{ position: 'relative', zIndex: 1 }}>
 
         {/* ═══════════ HERO SECTION ═══════════ */}
-        <section id="home" style={{ padding: '130px 40px 100px', maxWidth: '1300px', margin: '0 auto', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px', flexWrap: 'wrap' }}>
+        <section
+          id="home"
+          onMouseMove={handleHeroMouseMove}
+          onMouseEnter={() => setIsMouseOverHero(true)}
+          onMouseLeave={() => setIsMouseOverHero(false)}
+          style={{
+            padding: '140px 40px 110px',
+            maxWidth: '1300px',
+            margin: '0 auto',
+            width: '100%',
+            position: 'relative',
+            overflow: 'visible'
+          }}
+        >
+          {/* Animated Mesh, Grid & Spotlight Background */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              zIndex: 0,
+              overflow: 'hidden',
+              borderRadius: '24px'
+            }}
+          >
+            {/* Ambient Aurora Orbs */}
+            <motion.div
+              animate={{
+                x: [-30, 30, -30],
+                y: [-25, 25, -25],
+                scale: [1, 1.12, 1]
+              }}
+              transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                position: 'absolute',
+                top: '5%',
+                left: '15%',
+                width: '360px',
+                height: '360px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(212,175,55,0.09) 0%, transparent 70%)',
+                filter: 'blur(55px)',
+              }}
+            />
+            <motion.div
+              animate={{
+                x: [25, -25, 25],
+                y: [25, -25, 25],
+                scale: [1, 1.15, 1]
+              }}
+              transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+              style={{
+                position: 'absolute',
+                bottom: '5%',
+                right: '10%',
+                width: '420px',
+                height: '420px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(167,139,250,0.07) 0%, transparent 70%)',
+                filter: 'blur(65px)',
+              }}
+            />
+
+            {/* Futuristic Tech Grid */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)',
+                backgroundSize: '48px 48px',
+                maskImage: 'radial-gradient(ellipse at center, black 45%, transparent 80%)',
+                WebkitMaskImage: 'radial-gradient(ellipse at center, black 45%, transparent 80%)',
+                opacity: 0.8
+              }}
+            />
+
+            {/* Grid Laser Sweep line */}
+            <motion.div
+              animate={{ y: ['0%', '100%'] }}
+              transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.18), transparent)',
+                opacity: 0.55
+              }}
+            />
+
+            {/* Interactive Spotlight Glow */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                opacity: isMouseOverHero ? 1 : 0,
+                transition: 'opacity 0.4s ease',
+                background: `radial-gradient(circle 380px at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.08), transparent 70%)`,
+              }}
+            />
+
+            {/* Constellation nodes inside the fold */}
+            <ParticleConstellation />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
             
             {/* LEFT COPY */}
             <motion.div
@@ -349,7 +608,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
                 />
                 <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', color: 'var(--gold-primary)' }}>LIVE · COMPENSATION BLOCKCHAIN SYSTEM</span>
               </motion.div>
-
+              
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -357,13 +616,9 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
                 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5vw, 62px)', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-1px' }}
               >
                 Premium Wealth Begins With{' '}
-                <motion.span
-                  className="gold-text-gradient"
-                  animate={{ filter: ['brightness(1)', 'brightness(1.3)', 'brightness(1)'] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
+                <span className="gold-sheen-text">
                   Aurex Capital
-                </motion.span>
+                </span>
               </motion.h1>
 
               <motion.p
@@ -410,7 +665,6 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
               initial={{ opacity: 0, scale: 0.7, rotate: -15 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ scale: 1.04 }}
               style={{ flex: '1 1 380px', display: 'flex', justifyContent: 'center', position: 'relative' }}
             >
               {/* Glow rings around token */}
@@ -429,9 +683,136 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
                   }}
                 />
               ))}
+
+              {/* Floating Dashboard Card 1 - Top Left */}
+              <motion.div
+                className="desktop-only"
+                animate={{
+                  y: [0, -8, 0],
+                  rotate: [-1, 1, -1]
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                whileHover={{ scale: 1.05, zIndex: 10 }}
+                style={{
+                  position: 'absolute',
+                  top: '-8%',
+                  left: '-12%',
+                  background: 'rgba(15, 15, 15, 0.75)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '16px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 10px rgba(212,175,55,0.1)',
+                  zIndex: 2,
+                  cursor: 'default'
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(96,165,250,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa' }}>
+                  <Lock size={16} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Staking Pool</div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    $500.00
+                    <span style={{ position: 'relative', display: 'flex', height: '6px', width: '6px' }}>
+                      <span className="status-pill-pulse" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', backgroundColor: '#34d399', opacity: 0.75 }}></span>
+                      <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '6px', width: '6px', backgroundColor: '#34d399' }}></span>
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Floating Dashboard Card 2 - Bottom Left */}
+              <motion.div
+                className="desktop-only"
+                animate={{
+                  y: [0, 8, 0],
+                  rotate: [1, -1, 1]
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.2
+                }}
+                whileHover={{ scale: 1.05, zIndex: 10 }}
+                style={{
+                  position: 'absolute',
+                  bottom: '8%',
+                  left: '-8%',
+                  background: 'rgba(15, 15, 15, 0.75)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '16px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 10px rgba(212,175,55,0.1)',
+                  zIndex: 2,
+                  cursor: 'default'
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(52,211,153,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#34d399' }}>
+                  <TrendingUp size={16} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Daily Slab Yield</div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#34d399' }}>+0.225% ROI</div>
+                </div>
+              </motion.div>
+
+              {/* Floating Dashboard Card 3 - Middle Right */}
+              <motion.div
+                className="desktop-only"
+                animate={{
+                  y: [-5, 5, -5],
+                  x: [0, 5, 0]
+                }}
+                transition={{
+                  duration: 7,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 2.4
+                }}
+                whileHover={{ scale: 1.05, zIndex: 10 }}
+                style={{
+                  position: 'absolute',
+                  top: '32%',
+                  right: '-12%',
+                  background: 'rgba(15, 15, 15, 0.75)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '16px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 10px rgba(212,175,55,0.1)',
+                  zIndex: 2,
+                  cursor: 'default'
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(167,139,250,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a78bfa' }}>
+                  <Users size={16} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Binary Matching</div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: 'white' }}>$1,200.00 Paid</div>
+                </div>
+              </motion.div>
+
               <AnimatedToken size={360} />
             </motion.div>
           </div>
+
 
           {/* ── STATS BAR ── */}
           <motion.div

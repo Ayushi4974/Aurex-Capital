@@ -365,4 +365,40 @@ button, .btn {
   animation: cursorPulse 4s infinite ease-in-out;
 }
 
+@keyframes textSheen {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-sheen-text {
+  background: linear-gradient(
+    90deg,
+    #996515 0%,
+    #d4af37 25%,
+    #fff6d5 50%,
+    #d4af37 75%,
+    #996515 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textSheen 4.5s linear infinite;
+}
+
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-animation {
+  animation: floatSoft 5s infinite ease-in-out;
+}
+
+@media (max-width: 1024px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+
 
