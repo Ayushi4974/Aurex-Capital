@@ -414,28 +414,28 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
           backdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(255,255,255,0.05)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '14px 40px', flexWrap: 'wrap', gap: '16px'
+          padding: '18px 40px', flexWrap: 'wrap', gap: '16px'
         }}
       >
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          whileHover={{ scale: 1.03 }}
+          style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <motion.div
             animate={{ boxShadow: ['0 0 8px rgba(212,175,55,0.3)', '0 0 20px rgba(212,175,55,0.6)', '0 0 8px rgba(212,175,55,0.3)'] }}
             transition={{ duration: 2.5, repeat: Infinity }}
-            style={{ width: '38px', height: '38px', borderRadius: '10px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.07)' }}
+            style={{ width: '44px', height: '44px', borderRadius: '10px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.07)' }}
           >
-            <span style={{ fontSize: '16px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
+            <span style={{ fontSize: '18px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
           </motion.div>
           <div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '18px' }} className="gold-text-gradient">Aurex Capital</h3>
-            <span style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '1px' }}>V1.0 STAKING BACKOFFICE</span>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '23px', lineHeight: 1.1 }} className="gold-text-gradient">Aurex Capital</h3>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '1.2px', fontWeight: 700 }}>V1.0 STAKING BACKOFFICE</span>
           </div>
         </motion.div>
 
-        <nav style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <nav style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
           {navLinks.map((item, i) => (
             <motion.button
               key={item.id}
@@ -444,19 +444,19 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
               transition={{ delay: i * 0.05 }}
               whileHover={{ color: 'var(--gold-primary)', y: -1 }}
               onClick={() => scrollToSection(item.id)}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-grey)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', transition: 'all 0.2s' }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-grey)', fontSize: '15.5px', fontWeight: 700, cursor: 'pointer', padding: '8px 12px', borderRadius: '6px', transition: 'all 0.2s' }}
             >
               {item.label}
             </motion.button>
           ))}
         </nav>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '14px' }}>
           <motion.button
             whileHover={{ scale: 1.05, borderColor: 'var(--gold-primary)', color: 'var(--gold-primary)' }}
             whileTap={{ scale: 0.97 }}
             onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
-            style={{ padding: '8px 20px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'white', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}
+            style={{ padding: '10px 24px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'white', borderRadius: '20px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s' }}
           >
             Sign In
           </motion.button>
@@ -464,7 +464,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
             whileHover={{ scale: 1.07, boxShadow: '0 0 25px rgba(212,175,55,0.45)' }}
             whileTap={{ scale: 0.97 }}
             onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}
-            style={{ padding: '8px 20px', border: 'none', background: 'linear-gradient(135deg, #c8a84b, #f0c040)', color: '#0a0800', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+            style={{ padding: '10px 24px', border: 'none', background: 'linear-gradient(135deg, #c8a84b, #f0c040)', color: '#0a0800', borderRadius: '20px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer' }}
           >
             Register
           </motion.button>
