@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Mail, Lock, User, Phone, CheckCircle, AlertCircle } from 'lucide-react';
 import { api } from '../utils/api';
+import logoEmblem from '../assets/logo_emblem.png';
 
 export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode, presetRegData, isModal = true }) {
   const [formData, setFormData] = useState({
@@ -91,8 +92,8 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
     <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>FULL NAME</label>
-        <div style={{ position: 'relative' }}>
-          <User size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <User size={15} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input
             type="text"
             name="name"
@@ -100,7 +101,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
             placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
-            className="form-input"
+            className="form-input custom-auth-input"
             style={{ paddingLeft: '40px', fontSize: '13px', height: '45px' }}
           />
         </div>
@@ -108,8 +109,8 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
 
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>EMAIL ADDRESS</label>
-        <div style={{ position: 'relative' }}>
-          <Mail size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <Mail size={15} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input
             type="email"
             name="email"
@@ -117,7 +118,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
             placeholder="email@address.com"
             value={formData.email}
             onChange={handleChange}
-            className="form-input"
+            className="form-input custom-auth-input"
             style={{ paddingLeft: '40px', fontSize: '13px', height: '45px' }}
           />
         </div>
@@ -125,8 +126,8 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
 
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>PASSWORD</label>
-        <div style={{ position: 'relative' }}>
-          <Lock size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <Lock size={15} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input
             type="password"
             name="password"
@@ -134,7 +135,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
             placeholder="Choose Password"
             value={formData.password}
             onChange={handleChange}
-            className="form-input"
+            className="form-input custom-auth-input"
             style={{ paddingLeft: '40px', fontSize: '13px', height: '45px' }}
           />
         </div>
@@ -142,8 +143,8 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
 
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>MOBILE NUMBER</label>
-        <div style={{ position: 'relative' }}>
-          <Phone size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <Phone size={15} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input
             type="text"
             name="mobile"
@@ -151,7 +152,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
             placeholder="+1 (555) 000-0000"
             value={formData.mobile}
             onChange={handleChange}
-            className="form-input"
+            className="form-input custom-auth-input"
             style={{ paddingLeft: '40px', fontSize: '13px', height: '45px' }}
           />
         </div>
@@ -159,8 +160,8 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
 
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>SPONSOR ID</label>
-        <div style={{ position: 'relative' }}>
-          <Shield size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <Shield size={15} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input
             type="text"
             name="sponsorId"
@@ -168,7 +169,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
             placeholder="AC100001"
             value={formData.sponsorId}
             onChange={handleChange}
-            className="form-input"
+            className="form-input custom-auth-input"
             style={{ paddingLeft: '40px', textTransform: 'uppercase', fontSize: '13px', height: '45px' }}
           />
         </div>
@@ -176,9 +177,16 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
         {sponsorError && <span style={{ color: '#f87171', fontSize: '11px', marginTop: '5px', display: 'block', fontWeight: 600 }}>✘ {sponsorError}</span>}
       </div>
 
-      <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '8px', fontWeight: 700, fontSize: '14px', height: '48px', marginTop: '10px' }}>
+      <motion.button 
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.985 }}
+        type="submit" 
+        disabled={loading} 
+        className="btn custom-auth-btn" 
+        style={{ width: '100%', padding: '14px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', height: '48px', marginTop: '10px', cursor: 'pointer' }}
+      >
         {loading ? 'Initializing Node...' : 'Register Node'}
-      </button>
+      </motion.button>
     </form>
   );
 
@@ -242,7 +250,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
             margin: '0 auto 12px',
             background: 'linear-gradient(135deg, #181818, #0a0a0a)'
           }}>
-            <span style={{ fontSize: '26px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
+            <img src={logoEmblem} alt="Logo" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
           </div>
           <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }} className="gold-text-gradient">REGISTER NODE</h2>
           <p style={{ color: 'var(--text-grey)', fontSize: '13px', marginTop: '4px' }}>
@@ -250,7 +258,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
           </p>
         </div>
 
-        <div className="glass-card" style={{ padding: '28px', maxHeight: '520px', overflowY: 'auto' }}>
+        <div className="glass-card auth-card" style={{ padding: '28px', maxHeight: '520px', overflowY: 'auto' }}>
           {notifications}
           {formContent}
           <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: 'var(--text-grey)' }}>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
+import logoEmblem from '../assets/logo_emblem.png';
 
 export default function AnimatedToken({ size = 300 }) {
   const isSmall = size < 100;
@@ -56,7 +57,7 @@ function SmallAnimatedToken({ size }) {
           justifyContent: 'center',
         }}
       >
-        <span style={{ fontSize: `${size * 0.22}px`, fontWeight: 900, color: '#0a0a0a', textShadow: '0 1px 2px rgba(255,255,255,0.4)' }}>IMX</span>
+        <span style={{ fontSize: `${size * 0.13}px`, fontWeight: 900, color: '#0a0a0a', textShadow: '0 1px 2px rgba(255,255,255,0.4)', textAlign: 'center', lineHeight: 1.1, textTransform: 'uppercase' }}>AUREX<br/>CAPITAL</span>
       </motion.div>
     </div>
   );
@@ -299,7 +300,7 @@ function ThreeDInteractiveToken({ size }) {
           {/* IMX Logo Text */}
           <h2 style={{
             fontFamily: 'var(--font-display, "Outfit", "Inter", sans-serif)',
-            fontSize: `${size * 0.13}px`,
+            fontSize: `${size * 0.075}px`,
             fontWeight: 950,
             margin: 0,
             padding: 0,
@@ -307,22 +308,13 @@ function ThreeDInteractiveToken({ size }) {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.85))',
-            letterSpacing: '1.5px'
+            letterSpacing: '4px',
+            textAlign: 'center',
+            textTransform: 'uppercase',
+            lineHeight: 1.15
           }}>
-            IMX
+            AUREX<br/>CAPITAL
           </h2>
-          {/* Aurex Capital Base Subtitle */}
-          <span style={{
-            fontSize: `${size * 0.032}px`,
-            color: '#ffd700',
-            fontWeight: 800,
-            letterSpacing: '3px',
-            marginTop: '2px',
-            textShadow: '0 2px 4px rgba(0,0,0,0.9)',
-            textTransform: 'uppercase'
-          }}>
-            Aurex Capital
-          </span>
         </div>
 
         {/* Layer 6: Dynamic Floating Reflections & Shine Overlay [translateZ(20px)] */}

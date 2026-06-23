@@ -1,39 +1,84 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Colors */
+  /* ── DARK THEME (default) ── */
   --bg-black: #050505;
   --bg-darker: #0d0d0d;
   --bg-dark: #121212;
   --bg-card: #181818;
   --bg-card-hover: #222222;
-  
+  --bg-sidebar: #0d0d0d;
+  --bg-main: #050505;
+
   --gold-primary: #d4af37;
   --gold-secondary: #f3e5ab;
   --gold-dark: #aa7c11;
   --gold-bright: #ffdf00;
   --gold-glow: rgba(212, 175, 55, 0.25);
   --gold-glow-strong: rgba(212, 175, 55, 0.5);
-  
+
   --text-white: #ffffff;
   --text-grey: #a0a0a0;
   --text-muted: #666666;
-  
+
   --border-grey: rgba(255, 255, 255, 0.08);
   --border-gold: rgba(212, 175, 55, 0.3);
   --border-gold-hover: rgba(212, 175, 55, 0.6);
-  
+
+  --glass-bg: rgba(24, 24, 24, 0.75);
+  --glass-hover-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.1);
+  --input-bg: rgba(10, 10, 10, 0.8);
+  --input-focus-bg: rgba(20, 20, 20, 0.9);
+  --scrollbar-track: #050505;
+  --scrollbar-thumb: #181818;
+
   /* Fonts */
   --font-sans: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
-  
+
   color-scheme: dark;
+}
+
+/* ── LIGHT THEME ── */
+[data-theme="light"] {
+  --bg-black: #f0f2f5;
+  --bg-darker: #e4e7ed;
+  --bg-dark: #dde1e9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f9fb;
+  --bg-sidebar: #ffffff;
+  --bg-main: #f0f2f5;
+
+  --gold-primary: #b8861f;
+  --gold-secondary: #d4a017;
+  --gold-dark: #7a5c0a;
+  --gold-bright: #c9920a;
+  --gold-glow: rgba(184, 134, 31, 0.2);
+  --gold-glow-strong: rgba(184, 134, 31, 0.45);
+
+  --text-white: #111827;
+  --text-grey: #4b5563;
+  --text-muted: #9ca3af;
+
+  --border-grey: rgba(0, 0, 0, 0.1);
+  --border-gold: rgba(184, 134, 31, 0.35);
+  --border-gold-hover: rgba(184, 134, 31, 0.65);
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-hover-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 0 15px rgba(184, 134, 31, 0.1);
+  --input-bg: rgba(240, 242, 245, 0.9);
+  --input-focus-bg: #ffffff;
+  --scrollbar-track: #e4e7ed;
+  --scrollbar-thumb: #c8cdd6;
+
+  color-scheme: light;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
@@ -51,11 +96,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-black);
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-card);
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
@@ -90,7 +135,7 @@ body {
 
 /* Glassmorphism Card Style */
 .glass-card {
-  background: rgba(24, 24, 24, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-grey);
@@ -100,7 +145,7 @@ body {
 
 .glass-card:hover {
   border-color: var(--border-gold);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.1);
+  box-shadow: var(--glass-hover-shadow);
 }
 
 /* Interactive elements */
@@ -143,7 +188,7 @@ button, .btn {
 
 /* Inputs styling */
 .form-input {
-  background: rgba(10, 10, 10, 0.8);
+  background: var(--input-bg);
   border: 1px solid var(--border-grey);
   color: var(--text-white);
   padding: 12px 16px;
@@ -157,7 +202,7 @@ button, .btn {
 .form-input:focus {
   border-color: var(--gold-primary);
   box-shadow: 0 0 10px var(--gold-glow);
-  background: rgba(20, 20, 20, 0.9);
+  background: var(--input-focus-bg);
 }
 
 /* General Layout helpers */
@@ -211,14 +256,26 @@ button, .btn {
   100% { background-position: 0% 50%; }
 }
 .shifting-card {
-  background: linear-gradient(-45deg, rgba(24, 24, 24, 0.9), rgba(30, 26, 12, 0.9), rgba(16, 24, 30, 0.9), rgba(24, 24, 24, 0.9));
+  background: var(--glass-bg);
   background-size: 300% 300%;
   animation: shiftGradient 12s ease infinite;
   border: 1px solid var(--border-grey);
 }
+[data-theme="dark"] .shifting-card {
+  background: linear-gradient(-45deg, rgba(24, 24, 24, 0.9), rgba(30, 26, 12, 0.9), rgba(16, 24, 30, 0.9), rgba(24, 24, 24, 0.9));
+  background-size: 300% 300%;
+}
 .shifting-card:hover {
   border-color: var(--border-gold);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.15);
+  box-shadow: var(--glass-hover-shadow);
+}
+.nexus-tier-card {
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.nexus-tier-card:hover {
+  border-color: var(--gold-primary) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--gold-glow-strong) !important;
 }
 
 @keyframes numberPulse {
@@ -398,6 +455,67 @@ button, .btn {
   .desktop-only {
     display: none !important;
   }
+}
+
+/* Premium Auth Card & Custom Input styling */
+.auth-card {
+  background: rgba(18, 18, 18, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.1) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+.auth-card:hover {
+  border-color: rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.2) !important;
+}
+
+.input-group-wrapper {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-auth-input {
+  background: rgba(10, 10, 10, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 10px !important;
+  color: var(--text-white) !important;
+  font-family: var(--font-sans);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.custom-auth-input:hover {
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  background: rgba(15, 15, 15, 0.8) !important;
+}
+
+.custom-auth-input:focus {
+  border-color: var(--gold-primary) !important;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.18) !important;
+  background: rgba(22, 20, 14, 0.85) !important;
+  transform: translateY(-1px);
+}
+
+.input-group-wrapper:hover .input-icon,
+.input-group-wrapper:focus-within .input-icon {
+  color: var(--gold-primary) !important;
+  filter: drop-shadow(0 0 4px var(--gold-glow-strong));
+}
+
+.custom-auth-btn {
+  background: linear-gradient(135deg, var(--gold-secondary) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%) !important;
+  border: none !important;
+  color: var(--bg-black) !important;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.custom-auth-btn:hover {
+  background: linear-gradient(135deg, #ffffff 0%, var(--gold-bright) 60%, var(--gold-primary) 100%) !important;
+  box-shadow: 0 6px 22px rgba(212, 175, 55, 0.45) !important;
 }
 
 

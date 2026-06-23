@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Bell, Eye, EyeOff, CheckCircle, Lock, LogOut, Globe } from 'lucide-react';
+import { Shield, Bell, Eye, EyeOff, CheckCircle, Lock, LogOut, Globe, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Settings({ user }) {
+export default function Settings({ user, theme, onThemeChange }) {
   const [lang, setLang] = useState('en');
-  const [theme, setTheme] = useState('dark');
   const [notify, setNotify] = useState({ deposits: true, withdrawals: true, roi: true });
   
   // PIN setup states
@@ -25,21 +24,7 @@ export default function Settings({ user }) {
   }, [user.userId]);
 
   const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    if (newTheme === 'light') {
-      document.documentElement.style.setProperty('--bg-black', '#f7f7f7');
-      document.documentElement.style.setProperty('--bg-card', '#ffffff');
-      document.documentElement.style.setProperty('--text-white', '#0f0f0f');
-      document.documentElement.style.setProperty('--text-grey', '#5f5f5f');
-      document.documentElement.style.setProperty('--border-grey', '#e2e8f0');
-    } else {
-      document.documentElement.style.setProperty('--bg-black', '#050505');
-      document.documentElement.style.setProperty('--bg-card', '#0a0a0a');
-      document.documentElement.style.setProperty('--text-white', '#ffffff');
-      document.documentElement.style.setProperty('--text-grey', '#a3a3a3');
-      document.documentElement.style.setProperty('--border-grey', 'rgba(255,255,255,0.05)');
-    }
-    alert(`Theme changed to ${newTheme.toUpperCase()}`);
+    if (onThemeChange) onThemeChange(newTheme);
   };
 
   const handleSaveNotify = () => {
@@ -145,24 +130,61 @@ export default function Settings({ user }) {
               Display Layout Mode
             </h3>
             <div style={{ display: 'flex', gap: '12px' }}>
+              {/* Dark Luxury button */}
               <button 
                 onClick={() => handleThemeChange('dark')}
                 style={{
-                  flex: 1, padding: '12px', borderRadius: '8px', border: theme === 'dark' ? '1px solid var(--gold-primary)' : '1px solid var(--border-grey)',
-                  background: theme === 'dark' ? 'rgba(212,175,55,0.08)' : 'transparent', color: 'var(--text-white)', fontWeight: 700, cursor: 'pointer'
+                  flex: 1,
+                  padding: '14px 12px',
+                  borderRadius: '10px',
+                  border: theme === 'dark' ? '1.5px solid var(--gold-primary)' : '1px solid var(--border-grey)',
+                  background: theme === 'dark' ? 'rgba(212,175,55,0.1)' : 'rgba(0,0,0,0.2)',
+                  color: 'var(--text-white)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.25s ease',
+                  boxShadow: theme === 'dark' ? '0 0 12px rgba(212,175,55,0.2)' : 'none'
                 }}
               >
-                Dark Luxury
+                <Moon size={20} style={{ color: theme === 'dark' ? 'var(--gold-primary)' : 'var(--text-grey)' }} />
+                <span style={{ fontSize: '13px' }}>Dark Luxury</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Gold Dark Mode</span>
               </button>
+
+              {/* Light Minimalist button */}
               <button 
                 onClick={() => handleThemeChange('light')}
                 style={{
-                  flex: 1, padding: '12px', borderRadius: '8px', border: theme === 'light' ? '1px solid var(--gold-primary)' : '1px solid var(--border-grey)',
-                  background: theme === 'light' ? 'rgba(212,175,55,0.08)' : 'transparent', color: 'var(--text-white)', fontWeight: 700, cursor: 'pointer'
+                  flex: 1,
+                  padding: '14px 12px',
+                  borderRadius: '10px',
+                  border: theme === 'light' ? '1.5px solid var(--gold-primary)' : '1px solid var(--border-grey)',
+                  background: theme === 'light' ? 'rgba(184,134,31,0.12)' : 'rgba(255,255,255,0.03)',
+                  color: 'var(--text-white)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.25s ease',
+                  boxShadow: theme === 'light' ? '0 0 12px rgba(184,134,31,0.2)' : 'none'
                 }}
               >
-                Light Minimalist
+                <Sun size={20} style={{ color: theme === 'light' ? 'var(--gold-primary)' : 'var(--text-grey)' }} />
+                <span style={{ fontSize: '13px' }}>Light Minimalist</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Clean Light Mode</span>
               </button>
+            </div>
+
+            {/* Live indicator */}
+            <div style={{ marginTop: '14px', padding: '8px 12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--gold-primary)', display: 'inline-block', boxShadow: '0 0 6px var(--gold-glow)' }} />
+              Active theme: <strong style={{ color: 'var(--gold-primary)' }}>{theme === 'dark' ? 'Dark Luxury' : 'Light Minimalist'}</strong>
             </div>
           </motion.div>
 

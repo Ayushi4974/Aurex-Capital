@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Mail, Lock, User, Phone, CheckCircle, AlertCircle, HelpCircle } from 'lucide-react';
 import { api } from '../utils/api';
+import logoEmblem from '../assets/logo_emblem.png';
 
 export default function Auth({ onAuthSuccess, isLiveMode }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -173,12 +174,7 @@ export default function Auth({ onAuthSuccess, isLiveMode }) {
               background: 'linear-gradient(135deg, #181818, #0a0a0a)'
             }}
           >
-            <span style={{
-              fontSize: '32px',
-              fontWeight: 800,
-              fontFamily: 'var(--font-display)',
-              letterSpacing: '1px'
-            }} className="gold-text-gradient">IMX</span>
+            <img src={logoEmblem} alt="Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
           </motion.div>
           
           <h2 style={{ 

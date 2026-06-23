@@ -9,7 +9,10 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
   const [wallet, setWallet] = useState({ captok: { main: 0 } });
   const [stakes, setStakes] = useState([]);
   const [planType, setPlanType] = useState('FTP');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState('100');
+  const [depositNetwork, setDepositNetwork] = useState('BEP20');
+  const [hoveredPackage, setHoveredPackage] = useState(null);
+  const [hoveredNetwork, setHoveredNetwork] = useState(null);
   const [calculatedRoi, setCalculatedRoi] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -118,16 +121,21 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
           <motion.div 
             key={idx}
             whileHover={{ y: -6, scale: 1.025, transition: { duration: 0.2, ease: "easeOut" } }}
-            className="glass-card shifting-card" 
+            className="glass-card shifting-card nexus-tier-card" 
+            onClick={() => {
+              setAmount(tier.price.toString());
+              setPlanType('FTP');
+            }}
             style={{
               padding: '24px',
-              border: amount >= tier.price ? '1.5px solid var(--border-gold)' : '1px solid var(--border-grey)',
-              background: amount >= tier.price ? 'rgba(212, 175, 55, 0.05)' : 'rgba(0,0,0,0.3)',
-              position: 'relative'
+              border: parseFloat(amount) === tier.price ? '1.5px solid var(--border-gold)' : '1px solid var(--border-grey)',
+              background: parseFloat(amount) === tier.price ? 'rgba(212, 175, 55, 0.05)' : 'rgba(0,0,0,0.3)',
+              position: 'relative',
+              cursor: 'pointer'
             }}
           >
             <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-              <Zap size={14} style={{ color: amount >= tier.price ? 'var(--gold-primary)' : 'var(--text-muted)' }} />
+              <Zap size={14} style={{ color: parseFloat(amount) === tier.price ? 'var(--gold-primary)' : 'var(--text-muted)' }} />
             </div>
             <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--gold-primary)' }}>{tier.name}</h4>
             <h2 style={{ fontSize: '24px', fontWeight: 800, marginTop: '8px' }}>${tier.price.toLocaleString()}</h2>
@@ -137,7 +145,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '28px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '28px' }}>
         
         {/* Stake form */}
         <motion.div 
@@ -167,54 +175,136 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
               </span>
             </div>
 
-            {/* Plan selection */}
+            {/* Package Selection */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
-                SELECT INVESTMENT SYSTEM
+                SELECT PLAN PACKAGE
               </label>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <label style={{
-                  flex: 1, padding: '16px', borderRadius: '10px', cursor: 'pointer',
-                  border: planType === 'FTP' ? '1px solid var(--gold-primary)' : '1px solid var(--border-grey)',
-                  background: planType === 'FTP' ? 'rgba(212, 175, 55, 0.08)' : 'rgba(0, 0, 0, 0.2)',
-                  transition: 'all 0.2s'
-                }}>
-                  <input type="radio" name="planType" value="FTP" checked={planType === 'FTP'} onChange={() => setPlanType('FTP')} style={{ display: 'none' }} />
-                  <div style={{ fontWeight: 700, color: planType === 'FTP' ? 'var(--gold-primary)' : 'var(--text-white)' }}>FTP (Daily ROI)</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>Daily slab payouts commencing after 7 days maturity check.</div>
-                </label>
-                <label style={{
-                  flex: 1, padding: '16px', borderRadius: '10px', cursor: 'pointer',
-                  border: planType === 'UTP' ? '1px solid var(--gold-primary)' : '1px solid var(--border-grey)',
-                  background: planType === 'UTP' ? 'rgba(212, 175, 55, 0.08)' : 'rgba(0, 0, 0, 0.2)',
-                  transition: 'all 0.2s'
-                }}>
-                  <input type="radio" name="planType" value="UTP" checked={planType === 'UTP'} onChange={() => setPlanType('UTP')} style={{ display: 'none' }} />
-                  <div style={{ fontWeight: 700, color: planType === 'UTP' ? 'var(--gold-primary)' : 'var(--text-white)' }}>UTP (Unit Plan)</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>Weekly profit sharing declared manually by Admin. Multiples of $50.</div>
-                </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {nexusTiers.map((tier) => {
+                  const isSelected = parseFloat(amount) === tier.price;
+                  return (
+                    <div
+                      key={tier.name}
+                      onClick={() => {
+                        setAmount(tier.price.toString());
+                        setPlanType('FTP');
+                      }}
+                      onMouseEnter={() => setHoveredPackage(tier.name)}
+                      onMouseLeave={() => setHoveredPackage(null)}
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        border: isSelected 
+                          ? '1px solid var(--gold-primary)' 
+                          : (hoveredPackage === tier.name ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
+                        background: isSelected 
+                          ? 'rgba(212, 175, 55, 0.08)' 
+                          : (hoveredPackage === tier.name ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 700, color: isSelected ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '14px' }}>
+                          {tier.name}
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '2px' }}>
+                          {tier.desc}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 800, fontSize: '16px', color: isSelected ? 'var(--gold-primary)' : 'var(--text-white)' }}>
+                          ${tier.price.toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: '10px', color: '#34d399', fontWeight: 650, marginTop: '2px' }}>
+                          Daily ROI: {tier.roi}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Amount */}
+            {/* Network Selection */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
-                STAKE AMOUNT (USD)
+                SELECT DEPOSIT NETWORK
               </label>
-              <div style={{ position: 'relative' }}>
-                <DollarSign size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div 
+                  onClick={() => setDepositNetwork('BEP20')}
+                  onMouseEnter={() => setHoveredNetwork('BEP20')}
+                  onMouseLeave={() => setHoveredNetwork(null)}
+                  style={{
+                    flex: 1, padding: '16px', borderRadius: '10px', cursor: 'pointer',
+                    border: depositNetwork === 'BEP20' 
+                      ? '1px solid var(--gold-primary)' 
+                      : (hoveredNetwork === 'BEP20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
+                    background: depositNetwork === 'BEP20' 
+                      ? 'rgba(212, 175, 55, 0.08)' 
+                      : (hoveredNetwork === 'BEP20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                    transition: 'all 0.2s',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: depositNetwork === 'BEP20' ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '13px' }}>BEP20 (BSC)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>Binance Smart Chain Network</div>
+                </div>
+                <div 
+                  onClick={() => setDepositNetwork('TRC20')}
+                  onMouseEnter={() => setHoveredNetwork('TRC20')}
+                  onMouseLeave={() => setHoveredNetwork(null)}
+                  style={{
+                    flex: 1, padding: '16px', borderRadius: '10px', cursor: 'pointer',
+                    border: depositNetwork === 'TRC20' 
+                      ? '1px solid var(--gold-primary)' 
+                      : (hoveredNetwork === 'TRC20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
+                    background: depositNetwork === 'TRC20' 
+                      ? 'rgba(212, 175, 55, 0.08)' 
+                      : (hoveredNetwork === 'TRC20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                    transition: 'all 0.2s',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: depositNetwork === 'TRC20' ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '13px' }}>TRC20 (TRON)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>TRON Blockchain Network</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Deposit Address */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
+                DEPOSIT ADDRESS ({depositNetwork})
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <input
-                  type="number"
-                  placeholder={planType === 'FTP' ? 'Min: 100' : 'Multiples of 50'}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  type="text"
+                  value={depositNetwork === 'BEP20' ? '0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c' : 'TNVmB8GjS2fL6L5S6n9c3zF4vJqKmPnQrS'}
+                  readOnly
                   className="form-input"
-                  style={{ paddingLeft: '48px', fontSize: '18px', fontWeight: 700 }}
-                  required
+                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '13px', color: 'var(--gold-primary)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-grey)' }}
                 />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const addr = depositNetwork === 'BEP20' ? '0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c' : 'TNVmB8GjS2fL6L5S6n9c3zF4vJqKmPnQrS';
+                    navigator.clipboard.writeText(addr);
+                    alert(`${depositNetwork} deposit address copied to clipboard!`);
+                  }}
+                  className="btn btn-secondary"
+                  style={{ padding: '0 16px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', border: '1px solid var(--border-grey)', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '6px', cursor: 'pointer' }}
+                >
+                  Copy
+                </button>
               </div>
               <span style={{ fontSize: '11.5px', color: 'var(--gold-primary)', marginTop: '6.5px', display: 'block' }}>
-                Package Name: <strong>{amount ? getNexusPackageName(parseFloat(amount)) : 'None'}</strong>
+                Selected Package: <strong>{amount ? getNexusPackageName(parseFloat(amount)) : 'None'}</strong> (${amount ? parseFloat(amount).toLocaleString() : '0'})
               </span>
             </div>
 
@@ -251,7 +341,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
             {success && <div style={{ color: '#10b981', fontSize: '13px', marginBottom: '16px' }}>{success}</div>}
 
             <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}>
-              Confirm Stake
+              Confirm
               <ArrowRight size={16} />
             </button>
           </form>
@@ -383,6 +473,8 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
                           borderRadius: '12px',
                           fontSize: '11px',
                           fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                          display: 'inline-block',
                           background: stake.status === 'Completed' ? 'rgba(239, 68, 68, 0.1)' : isFTP && !isMature ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
                           color: stake.status === 'Completed' ? '#f87171' : isFTP && !isMature ? '#fbbf24' : '#34d399',
                           border: stake.status === 'Completed' ? '1px solid rgba(239, 68, 68, 0.2)' : isFTP && !isMature ? '1px solid rgba(245, 158, 11, 0.2)' : '1px solid rgba(16, 185, 129, 0.2)'

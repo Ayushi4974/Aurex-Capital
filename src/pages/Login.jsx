@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { api } from '../utils/api';
+import logoEmblem from '../assets/logo_emblem.png';
 
 export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode, isModal = true }) {
   const [formData, setFormData] = useState({ userId: '', password: '' });
@@ -37,8 +38,8 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
     <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 700, letterSpacing: '0.7px' }}>USER ID</label>
-        <div style={{ position: 'relative' }}>
-          <Shield size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <Shield size={16} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input 
             type="text" 
             name="userId" 
@@ -46,16 +47,16 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
             placeholder="AC100002" 
             value={formData.userId}
             onChange={handleChange}
-            className="form-input" 
+            className="form-input custom-auth-input" 
             style={{ paddingLeft: '40px', fontSize: '13px', height: '45px' }} 
           />
         </div>
       </div>
-
+ 
       <div style={{ marginBottom: '8px' }}>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 700, letterSpacing: '0.7px' }}>PASSWORD</label>
-        <div style={{ position: 'relative' }}>
-          <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="input-group-wrapper">
+          <Lock size={16} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
           <input 
             type="password" 
             name="password" 
@@ -63,18 +64,25 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
             placeholder="••••••••" 
             value={formData.password}
             onChange={handleChange}
-            className="form-input" 
+            className="form-input custom-auth-input" 
             style={{ paddingLeft: '40px', fontSize: '13px', height: '45px' }} 
           />
         </div>
       </div>
-
-      <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '8px', fontWeight: 700, fontSize: '14px', height: '48px', marginTop: '10px' }}>
+ 
+      <motion.button 
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.985 }}
+        type="submit" 
+        disabled={loading} 
+        className="btn custom-auth-btn" 
+        style={{ width: '100%', padding: '14px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', height: '48px', marginTop: '10px', cursor: 'pointer' }}
+      >
         {loading ? 'Authenticating...' : 'Sign In to Account'}
-      </button>
+      </motion.button>
     </form>
   );
-
+ 
   const notifications = (
     <AnimatePresence mode="wait">
       {error && (
@@ -91,7 +99,7 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
       )}
     </AnimatePresence>
   );
-
+ 
   if (isModal) {
     return (
       <div style={{ width: '100%' }}>
@@ -100,7 +108,7 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
       </div>
     );
   }
-
+ 
   // Standalone page layout fallback
   return (
     <div style={{
@@ -115,7 +123,7 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
     }}>
       <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(170, 124, 17, 0.06) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
-
+ 
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -135,13 +143,13 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
             margin: '0 auto 16px',
             background: 'linear-gradient(135deg, #181818, #0a0a0a)'
           }}>
-            <span style={{ fontSize: '26px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
+            <img src={logoEmblem} alt="Logo" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
           </div>
           <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '30px' }} className="gold-text-gradient">SIGN IN</h2>
           <p style={{ color: 'var(--text-grey)', fontSize: '13px', marginTop: '6px' }}>Secure Node Authentication portal</p>
         </div>
-
-        <div className="glass-card" style={{ padding: '32px' }}>
+ 
+        <div className="glass-card auth-card" style={{ padding: '32px' }}>
           {notifications}
           {formContent}
           <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: 'var(--text-grey)' }}>

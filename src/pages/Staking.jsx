@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign, ShieldAlert, Award, Calendar, RefreshCcw, ArrowRight, Zap } from 'lucide-react';
 import { api } from '../utils/api';
-import { getFTPSlab } from '../utils/simDb';
+import { getFTPSlab, getNexusPackageName } from '../utils/simDb';
 import confetti from 'canvas-confetti';
 
 export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigger }) {
@@ -11,7 +11,10 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
   
   // Staking Form State
   const [planType, setPlanType] = useState('FTP');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState('100');
+  const [depositNetwork, setDepositNetwork] = useState('BEP20');
+  const [hoveredPackage, setHoveredPackage] = useState(null);
+  const [hoveredNetwork, setHoveredNetwork] = useState(null);
   const [calculatedRoi, setCalculatedRoi] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -89,6 +92,14 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
     }
   };
 
+  const nexusTiers = [
+    { name: 'Nexus Start', price: 100, roi: '0.25%', desc: 'Ideal for basic node activation.' },
+    { name: 'Nexus Pro', price: 500, roi: '0.50%', desc: 'Accelerate unilevel tree overrides.' },
+    { name: 'Nexus Elite', price: 1000, roi: '0.75%', desc: 'Premium yields, standard unilevel multipliers.' },
+    { name: 'Nexus Titan', price: 5000, roi: '1.00%', desc: 'High ROI limits, extra global pool weights.' },
+    { name: 'Nexus Infinity', price: 10000, roi: '2.00%', desc: 'Ultimate yields & direct leadership rankings.' }
+  ];
+
   // Slabs metadata for display
   const slabs = [
     { range: '$50 - $249', roi: '0.100%' },
@@ -118,9 +129,8 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr',
+        gridTemplateColumns: '1fr',
         gap: '28px',
-        alignItems: 'start',
         marginBottom: '40px'
       }}>
         {/* Left Side: Staking Action */}
@@ -147,88 +157,137 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
               </span>
             </div>
 
-            {/* Plan Selector */}
+            {/* Package Selection */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
                 SELECT PLAN PACKAGE
               </label>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                {/* FTP Plan */}
-                <label style={{
-                  flex: 1,
-                  padding: '18px',
-                  borderRadius: '12px',
-                  background: planType === 'FTP' ? 'rgba(212, 175, 55, 0.08)' : 'rgba(0, 0, 0, 0.3)',
-                  border: planType === 'FTP' ? '1px solid var(--gold-primary)' : '1px solid var(--border-grey)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <input 
-                    type="radio" 
-                    name="planType" 
-                    value="FTP" 
-                    checked={planType === 'FTP'}
-                    onChange={() => setPlanType('FTP')}
-                    style={{ display: 'none' }}
-                  />
-                  <div style={{ fontWeight: 700, color: planType === 'FTP' ? 'var(--gold-primary)' : 'var(--text-white)' }}>
-                    Fixed Token Plan (FTP)
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-grey)', marginTop: '4px' }}>
-                    Daily ROI slabs matching stake amount. Begins after 7 days delay.
-                  </div>
-                </label>
-
-                {/* UTP Plan */}
-                <label style={{
-                  flex: 1,
-                  padding: '18px',
-                  borderRadius: '12px',
-                  background: planType === 'UTP' ? 'rgba(212, 175, 55, 0.08)' : 'rgba(0, 0, 0, 0.3)',
-                  border: planType === 'UTP' ? '1px solid var(--gold-primary)' : '1px solid var(--border-grey)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <input 
-                    type="radio" 
-                    name="planType" 
-                    value="UTP" 
-                    checked={planType === 'UTP'}
-                    onChange={() => setPlanType('UTP')}
-                    style={{ display: 'none' }}
-                  />
-                  <div style={{ fontWeight: 700, color: planType === 'UTP' ? 'var(--gold-primary)' : 'var(--text-white)' }}>
-                    Unit Token Plan (UTP)
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-grey)', marginTop: '4px' }}>
-                    Weekly Profit Sharing (PSP). Eligible if staked before Monday (00:00).
-                  </div>
-                </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {nexusTiers.map((tier) => {
+                  const isSelected = parseFloat(amount) === tier.price;
+                  return (
+                    <div
+                      key={tier.name}
+                      onClick={() => {
+                        setAmount(tier.price.toString());
+                        setPlanType('FTP');
+                      }}
+                      onMouseEnter={() => setHoveredPackage(tier.name)}
+                      onMouseLeave={() => setHoveredPackage(null)}
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        border: isSelected 
+                          ? '1px solid var(--gold-primary)' 
+                          : (hoveredPackage === tier.name ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
+                        background: isSelected 
+                          ? 'rgba(212, 175, 55, 0.08)' 
+                          : (hoveredPackage === tier.name ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 700, color: isSelected ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '14px' }}>
+                          {tier.name}
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '2px' }}>
+                          {tier.desc}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 800, fontSize: '16px', color: isSelected ? 'var(--gold-primary)' : 'var(--text-white)' }}>
+                          ${tier.price.toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: '10px', color: '#34d399', fontWeight: 650, marginTop: '2px' }}>
+                          Daily ROI: {tier.roi}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Amount Input */}
+            {/* Network Selection */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
-                STAKE AMOUNT (USD / IMX LOTS)
+                SELECT DEPOSIT NETWORK
               </label>
-              <div style={{ position: 'relative' }}>
-                <DollarSign size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input 
-                  type="number" 
-                  placeholder={planType === 'FTP' ? 'Min: 50' : 'Multiples of 50'}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="form-input"
-                  style={{ paddingLeft: '48px', fontSize: '18px', fontWeight: 700 }}
-                  required
-                />
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div 
+                  onClick={() => setDepositNetwork('BEP20')}
+                  onMouseEnter={() => setHoveredNetwork('BEP20')}
+                  onMouseLeave={() => setHoveredNetwork(null)}
+                  style={{
+                    flex: 1, padding: '16px', borderRadius: '10px', cursor: 'pointer',
+                    border: depositNetwork === 'BEP20' 
+                      ? '1px solid var(--gold-primary)' 
+                      : (hoveredNetwork === 'BEP20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
+                    background: depositNetwork === 'BEP20' 
+                      ? 'rgba(212, 175, 55, 0.08)' 
+                      : (hoveredNetwork === 'BEP20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                    transition: 'all 0.2s',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: depositNetwork === 'BEP20' ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '13px' }}>BEP20 (BSC)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>Binance Smart Chain Network</div>
+                </div>
+                <div 
+                  onClick={() => setDepositNetwork('TRC20')}
+                  onMouseEnter={() => setHoveredNetwork('TRC20')}
+                  onMouseLeave={() => setHoveredNetwork(null)}
+                  style={{
+                    flex: 1, padding: '16px', borderRadius: '10px', cursor: 'pointer',
+                    border: depositNetwork === 'TRC20' 
+                      ? '1px solid var(--gold-primary)' 
+                      : (hoveredNetwork === 'TRC20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
+                    background: depositNetwork === 'TRC20' 
+                      ? 'rgba(212, 175, 55, 0.08)' 
+                      : (hoveredNetwork === 'TRC20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                    transition: 'all 0.2s',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: depositNetwork === 'TRC20' ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '13px' }}>TRC20 (TRON)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>TRON Blockchain Network</div>
+                </div>
               </div>
-              {planType === 'UTP' && (
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px', display: 'block' }}>
-                  UTP requires buying in lots of $50 (e.g. $50, $100, $150, etc.).
-                </span>
-              )}
+            </div>
+
+            {/* Deposit Address */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
+                DEPOSIT ADDRESS ({depositNetwork})
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={depositNetwork === 'BEP20' ? '0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c' : 'TNVmB8GjS2fL6L5S6n9c3zF4vJqKmPnQrS'}
+                  readOnly
+                  className="form-input"
+                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '13px', color: 'var(--gold-primary)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-grey)' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const addr = depositNetwork === 'BEP20' ? '0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c' : 'TNVmB8GjS2fL6L5S6n9c3zF4vJqKmPnQrS';
+                    navigator.clipboard.writeText(addr);
+                    alert(`${depositNetwork} deposit address copied to clipboard!`);
+                  }}
+                  className="btn btn-secondary"
+                  style={{ padding: '0 16px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', border: '1px solid var(--border-grey)', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '6px', cursor: 'pointer' }}
+                >
+                  Copy
+                </button>
+              </div>
+              <span style={{ fontSize: '11.5px', color: 'var(--gold-primary)', marginTop: '6.5px', display: 'block' }}>
+                Selected Package: <strong>{amount ? getNexusPackageName(parseFloat(amount)) : 'None'}</strong> (${amount ? parseFloat(amount).toLocaleString() : '0'})
+              </span>
             </div>
 
             {/* Live Calculation Feedback */}
@@ -299,7 +358,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                 gap: '8px'
               }}
             >
-              {loading ? 'Processing...' : 'Confirm and Stake Capital'}
+              {loading ? 'Processing...' : 'Confirm'}
               <ArrowRight size={18} />
             </button>
           </form>
@@ -408,6 +467,8 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                           borderRadius: '12px',
                           fontSize: '11px',
                           fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                          display: 'inline-block',
                           background: stake.status === 'Completed' ? 'rgba(255,255,255,0.05)' : isFTP && !isMature ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
                           color: stake.status === 'Completed' ? 'var(--text-muted)' : isFTP && !isMature ? '#fbbf24' : '#34d399',
                           border: stake.status === 'Completed' ? '1px solid rgba(255,255,255,0.1)' : isFTP && !isMature ? '1px solid rgba(245, 158, 11, 0.2)' : '1px solid rgba(16, 185, 129, 0.2)'

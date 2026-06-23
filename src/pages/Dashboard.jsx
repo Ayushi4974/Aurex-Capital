@@ -102,7 +102,7 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
       'AC100004 just earned $7.50 Daily ROI (0.75%) from Nexus Elite',
       'AC100007 completed $120.00 withdrawal payout request successfully',
       'New stakeholder AC100008 registered placement in Left leg under AC100002',
-      'AC100002 staked an additional $500.00 package in FTP (Nexus Pro)',
+      'AC100002 staked an additional $500.00 package in Nexus Pro',
       'Weekly UTP Profit Share declared at +8.0% for all locked stakes',
       'AC100003 Direct Referral Reward +$120.00 credited to ProTok wallet',
       'Aurex Consensus Node completed block consensus verification: 100% OK'
@@ -335,7 +335,7 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }} className="gold-text-gradient">
-              Aurex Capital Backoffice
+              Aurex Capital Dashboard
             </h1>
             <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '2px' }}>
               Secure unilevel downline portals and premium cryptocurrency investment packages dashboard.

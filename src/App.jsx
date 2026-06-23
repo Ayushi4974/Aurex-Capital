@@ -46,7 +46,6 @@ import DailyROIHistory from './pages/DailyROIHistory';
 import Network from './pages/Network';
 import Hierarchy from './pages/Hierarchy';
 import EarningsHistory from './pages/EarningsHistory';
-import Withdraw from './pages/Withdraw';
 import RankRewards from './pages/RankRewards';
 import Support from './pages/Support';
 import Settings from './pages/Settings';
@@ -60,6 +59,9 @@ import InvestmentManagement from './pages/InvestmentManagement';
 import BonusManagement from './pages/BonusManagement';
 import SupportAdmin from './pages/SupportAdmin';
 import AdminSettings from './pages/AdminSettings';
+
+import logoEmblem from './assets/logo_emblem.png';
+import logoTransparent from './assets/logo_transparent.png';
 
 // Utilities
 import { api, checkBackendHealth } from './utils/api';
@@ -138,9 +140,16 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [lastSyncSeconds, setLastSyncSeconds] = useState(0);
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const [theme, setTheme] = useState(() => localStorage.getItem('aurex_theme') || 'dark');
 
   // Preset state for downline registration from binary hierarchy tree
   const [presetRegData, setPresetRegData] = useState(null);
+
+  // Apply data-theme to <html> element whenever theme changes
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('aurex_theme', theme);
+  }, [theme]);
 
   // Track mouse coordinates for cursor glow
   useEffect(() => {
@@ -263,8 +272,6 @@ export default function App() {
         return <Dashboard user={user} onNavigate={setCurrentPage} isLiveMode={isLiveMode} refreshTrigger={refreshTrigger} />;
       case 'profile':
         return <Profile user={user} />;
-      case 'wallet':
-        return <WalletManager user={user} isLiveMode={isLiveMode} onRefreshUser={triggerRefresh} refreshTrigger={refreshTrigger} />;
       case 'stake':
         return <Stake user={user} isLiveMode={isLiveMode} onRefreshUser={triggerRefresh} refreshTrigger={refreshTrigger} />;
       case 'daily-roi':
@@ -276,13 +283,13 @@ export default function App() {
       case 'earnings':
         return <EarningsHistory user={user} isLiveMode={isLiveMode} refreshTrigger={refreshTrigger} />;
       case 'withdraw':
-        return <Withdraw user={user} isLiveMode={isLiveMode} onRefreshUser={triggerRefresh} refreshTrigger={refreshTrigger} />;
+        return <WalletManager user={user} isLiveMode={isLiveMode} onRefreshUser={triggerRefresh} refreshTrigger={refreshTrigger} />;
       case 'rank-rewards':
         return <RankRewards user={user} />;
       case 'support':
         return <Support user={user} />;
       case 'settings':
-        return <Settings user={user} />;
+        return <Settings user={user} theme={theme} onThemeChange={setTheme} />;
 
       // Admin Backoffice Pages (8 Pages)
       case 'admin-dashboard':
@@ -407,7 +414,7 @@ export default function App() {
             <aside 
               className={`sidebar-transition ${sidebarCollapsed ? 'sidebar-collapsed-width' : 'sidebar-expanded-width'}`}
               style={{
-                background: '#0d0d0d',
+                background: 'var(--bg-sidebar)',
                 borderRight: '1px solid var(--border-grey)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -416,7 +423,8 @@ export default function App() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 100,
-                overflowY: 'auto'
+                overflowY: 'auto',
+                transition: 'background 0.3s ease'
               }}
             >
               <div>
@@ -430,22 +438,21 @@ export default function App() {
                   gap: '12px' 
                 }}>
                   {!sidebarCollapsed ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justify: 'center', background: 'rgba(212,175,55,0.05)', boxShadow: '0 0 10px var(--gold-glow)' }}>
-                        <span style={{ fontSize: '16px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.05)', boxShadow: '0 0 12px var(--gold-glow)', overflow: 'hidden' }}>
+                        <img src={logoEmblem} alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
                       </div>
                       <div>
-                        <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '18px' }} className="gold-text-gradient">Aurex Capital</h3>
-                        <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>V1.0 Staking Backoffice</span>
+                        <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '22px', margin: 0, padding: 0 }} className="gold-text-gradient">Aurex Capital</h3>
                       </div>
                     </div>
                   ) : (
                     <div 
-                      style={{ width: '36px', height: '36px', borderRadius: '10px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justify: 'center', background: 'rgba(212,175,55,0.05)', boxShadow: '0 0 10px var(--gold-glow)', cursor: 'pointer' }} 
+                      style={{ width: '44px', height: '44px', borderRadius: '10px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.05)', boxShadow: '0 0 10px var(--gold-glow)', cursor: 'pointer', overflow: 'hidden' }} 
                       onClick={() => setSidebarCollapsed(false)}
                       title="Expand Menu"
                     >
-                      <span style={{ fontSize: '16px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
+                      <img src={logoEmblem} alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
                     </div>
                   )}
                   {!sidebarCollapsed && (
@@ -468,13 +475,12 @@ export default function App() {
                 <nav style={{ padding: sidebarCollapsed ? '10px 6px' : '0 12px 14px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: sidebarCollapsed ? '14px' : '0' }}>
                   {[
                     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                    { id: 'wallet', label: 'Wallet', icon: Wallet },
+                    { id: 'withdraw', label: 'Withdraw', icon: Wallet },
                     { id: 'stake', label: 'Investment / Stake', icon: Zap },
                     { id: 'daily-roi', label: 'ROI History', icon: Calendar },
                     { id: 'referrals', label: 'Team / Referrals', icon: Users },
                     { id: 'hierarchy', label: 'Binary Tree', icon: GitFork },
                     { id: 'earnings', label: 'Earnings', icon: Gift },
-                    { id: 'withdraw', label: 'Withdraw', icon: Landmark },
                     { id: 'rank-rewards', label: 'Rewards & Ranks', icon: Award },
                     { id: 'support', label: 'Support', icon: HelpCircle },
                     { id: 'settings', label: 'Settings', icon: SettingsIcon },
@@ -569,12 +575,14 @@ export default function App() {
               {/* Sidebar Profile & Logout Footer */}
               <div style={{ padding: sidebarCollapsed ? '16px 8px' : '16px', borderTop: '1px solid var(--border-grey)', background: 'rgba(0,0,0,0.15)' }}>
                 {!sidebarCollapsed ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                    <div className="avatar-ring-container">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                    <div className="avatar-ring-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <div className="avatar-ring-border"></div>
-                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--gold-primary), var(--gold-dark))', display: 'flex', alignItems: 'center', justify: 'center', color: 'black', fontWeight: 'bold', fontSize: '11px', zIndex: 2 }}>
-                        {user.name.substring(0, 2).toUpperCase()}
-                      </div>
+                      <img 
+                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
+                        alt="Profile Avatar"
+                        style={{ width: '32px', height: '32px', borderRadius: '50%', zIndex: 2, border: '1px solid var(--border-gold)', background: 'var(--bg-card)' }}
+                      />
                     </div>
                     <div style={{ overflow: 'hidden' }}>
                       <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-white)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user.name}</p>
@@ -583,11 +591,13 @@ export default function App() {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
-                    <div className="avatar-ring-container" title={`${user.name} (${user.userId})`}>
+                    <div className="avatar-ring-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={`${user.name} (${user.userId})`}>
                       <div className="avatar-ring-border"></div>
-                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--gold-primary), var(--gold-dark))', display: 'flex', alignItems: 'center', justify: 'center', color: 'black', fontWeight: 'bold', fontSize: '11px', zIndex: 2 }}>
-                        {user.name.substring(0, 2).toUpperCase()}
-                      </div>
+                      <img 
+                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
+                        alt="Profile Avatar"
+                        style={{ width: '32px', height: '32px', borderRadius: '50%', zIndex: 2, border: '1px solid var(--border-gold)', background: 'var(--bg-card)' }}
+                      />
                     </div>
                   </div>
                 )}
@@ -617,38 +627,10 @@ export default function App() {
             </aside>
 
             {/* Main Content Body */}
-            <main style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column', background: 'radial-gradient(circle at top right, #0e0a02 0%, #050505 60%)', overflowY: 'auto' }}>
+            <main style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column', background: theme === 'light' ? 'var(--bg-main)' : 'radial-gradient(circle at top right, #0e0a02 0%, #050505 60%)', overflowY: 'auto', transition: 'background 0.3s ease' }}>
               
               {/* Virtual Clock Display (Demo mode only) */}
-              {!isLiveMode && (
-                <div style={{
-                  background: 'rgba(212, 175, 55, 0.05)', borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
-                  padding: '8px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  fontSize: '11px', color: 'var(--gold-primary)', position: 'sticky', top: 0, backdropFilter: 'blur(8px)', zIndex: 90
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Clock size={12} />
-                    <span>Virtual Clock Time: <strong>{dbGetVirtualDate().toDateString()}</strong></span>
-                  </div>
 
-                  {/* Sandbox Overrides buttons */}
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={handleSimAdvanceDay} style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid var(--border-gold)', color: 'var(--gold-primary)', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px' }}>
-                      +1 Day
-                    </button>
-                    <button onClick={handleSimRunROICron} style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid var(--border-gold)', color: 'var(--gold-primary)', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px' }}>
-                      Run ROI Cron
-                    </button>
-                    <button onClick={handleSimRunBinaryCron} style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid var(--border-gold)', color: 'var(--gold-primary)', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px' }}>
-                      Run Binary Cron
-                    </button>
-                    <button onClick={triggerRefresh} style={{ background: 'transparent', border: 'none', color: 'var(--gold-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '2px', fontSize: '10px' }}>
-                      <RefreshCw size={10} />
-                      Sync
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Views rendering */}
               <div style={{ flex: 1 }}>

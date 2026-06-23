@@ -8,6 +8,8 @@ import {
 import Login from './Login';
 import Register from './Register';
 import AnimatedToken from '../components/AnimatedToken';
+import logoEmblem from '../assets/logo_emblem.png';
+import logoTransparent from '../assets/logo_transparent.png';
 
 /* ─────────────────────────── Animated Counter ─────────────────────────── */
 function CountUp({ target, suffix = '', prefix = '' }) {
@@ -419,19 +421,18 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
       >
         <motion.div
           whileHover={{ scale: 1.03 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <motion.div
             animate={{ boxShadow: ['0 0 8px rgba(212,175,55,0.3)', '0 0 20px rgba(212,175,55,0.6)', '0 0 8px rgba(212,175,55,0.3)'] }}
             transition={{ duration: 2.5, repeat: Infinity }}
-            style={{ width: '44px', height: '44px', borderRadius: '10px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.07)' }}
+            style={{ width: '56px', height: '56px', borderRadius: '14px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.07)', overflow: 'hidden' }}
           >
-            <span style={{ fontSize: '18px', fontWeight: 800 }} className="gold-text-gradient">IMX</span>
+            <img src={logoEmblem} alt="Logo" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
           </motion.div>
           <div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '23px', lineHeight: 1.1 }} className="gold-text-gradient">Aurex Capital</h3>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '1.2px', fontWeight: 700 }}>V1.0 STAKING BACKOFFICE</span>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '26px', lineHeight: 1.1, margin: 0, padding: 0 }} className="gold-text-gradient">Aurex Capital</h3>
           </div>
         </motion.div>
 
@@ -853,7 +854,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
               style={{ padding: '44px', lineHeight: 1.85, color: 'var(--text-grey)', display: 'flex', flexDirection: 'column', gap: '24px' }}
             >
               <p style={{ fontSize: '16px' }}>
-                Aurex Capital is a leading decentralised MLM genealogy and investment staking ecosystem built around the <strong style={{ color: 'var(--gold-primary)' }}>IMX Utility Token</strong>. Our platform configures stable, transparent wealth opportunities by integrating daily ROI slab yields with binary match leg matrices.
+                Aurex Capital is a leading decentralised MLM genealogy and investment staking ecosystem built around the <strong style={{ color: 'var(--gold-primary)' }}>Aurex Utility Token</strong>. Our platform configures stable, transparent wealth opportunities by integrating daily ROI slab yields with binary match leg matrices.
               </p>
               <p style={{ fontSize: '15px' }}>
                 Our algorithms run completely on-chain, keeping platform assets secure, auditable, and easily accessible. Stakers benefit from automated calculation panels, direct sponsor incentives, and 24/7 premium support systems.
