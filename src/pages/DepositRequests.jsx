@@ -24,7 +24,7 @@ export default function DepositRequests({ isLiveMode, onRefreshUser, refreshTrig
     setLoading(true);
     try {
       await api.adminApproveDeposit(txId, isLiveMode);
-      alert('Deposit approved! CapTok Main updated.');
+      alert('Deposit approved! Fund Wallet updated.');
       fetchDeposits();
       onRefreshUser();
     } catch (err) {
@@ -62,7 +62,7 @@ export default function DepositRequests({ isLiveMode, onRefreshUser, refreshTrig
           Deposit <span className="gold-text-gradient">Requests Review</span>
         </h1>
         <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-          Audit manual balance uploads, review bank slips, and credit CapTok Main values
+          Audit manual balance uploads, review bank slips, and credit Fund Wallet values
         </p>
       </motion.div>
 

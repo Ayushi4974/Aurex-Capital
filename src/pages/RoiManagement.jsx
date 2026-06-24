@@ -53,7 +53,7 @@ export default function RoiManagement() {
       </motion.div>
 
       {/* Control Triggers */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div className="responsive-grid-2" style={{ gap: '24px' }}>
         <motion.div
           initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
           whileHover={{ y: -8, scale: 1.02, boxShadow: '0 16px 36px rgba(212,175,55,0.15)', transition: { duration: 0.2 } }}

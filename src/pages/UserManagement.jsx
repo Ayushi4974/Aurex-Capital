@@ -111,7 +111,7 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
             User <span className="gold-text-gradient">Management Backoffice</span>
           </h1>
           <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-            Inspect registered nodes, reset credentials, and adjust tree configurations.
+            Inspect registered accounts, reset credentials, and adjust tree configurations.
           </p>
         </div>
 
@@ -147,9 +147,9 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
                 <th style={{ padding: '12px 10px' }}>Email Address</th>
                 <th style={{ padding: '12px 10px' }}>Sponsor ID</th>
                 <th style={{ padding: '12px 10px' }}>Parent (Placement)</th>
-                <th style={{ padding: '12px 10px' }}>CapTok Main</th>
+                <th style={{ padding: '12px 10px' }}>Fund Wallet</th>
                 <th style={{ padding: '12px 10px' }}>ProTok Profit</th>
-                <th style={{ padding: '12px 10px' }}>Node State</th>
+                <th style={{ padding: '12px 10px' }}>Account Status</th>
                 <th style={{ padding: '12px 10px', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
@@ -271,14 +271,14 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
               </button>
 
               <h2 style={{ fontSize: '20px', fontFamily: 'var(--font-display)', marginBottom: '4px' }}>
-                Edit Node Profile: <span className="gold-text-gradient">{editingUser.userId}</span>
+                Edit Account Profile: <span className="gold-text-gradient">{editingUser.userId}</span>
               </h2>
               <p style={{ fontSize: '11.5px', color: 'var(--text-grey)', marginBottom: '20px' }}>
-                Modify structural parameters or reset staker passwords.
+                Modify structural parameters or reset member passwords.
               </p>
 
               <form onSubmit={handleSaveEdit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+                <div className="responsive-grid-2" style={{ gap: '16px', marginBottom: '14px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>FULL NAME</label>
                     <input 
@@ -311,7 +311,7 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+                <div className="responsive-grid-2" style={{ gap: '16px', marginBottom: '14px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>SPONSOR ID</label>
                     <input 
@@ -322,7 +322,7 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>PARENT NODE ID</label>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>PARENT ID</label>
                     <input 
                       type="text" 
                       value={editForm.parentId} 
@@ -332,7 +332,7 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
+                <div className="responsive-grid-2" style={{ gap: '16px', marginBottom: '18px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>LEG PLACEMENT</label>
                     <select 
@@ -346,14 +346,14 @@ export default function UserManagement({ isLiveMode, refreshTrigger }) {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>NODE STATUS</label>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>ACCOUNT STATUS</label>
                     <select 
                       value={editForm.isActive ? 'Active' : 'Suspended'}
                       onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'Active' })}
                       className="form-input"
                       style={{ background: '#000', color: '#fff' }}
                     >
-                      <option value="Active">Active Node</option>
+                      <option value="Active">Active Account</option>
                       <option value="Suspended">Suspended / Inactive</option>
                     </select>
                   </div>

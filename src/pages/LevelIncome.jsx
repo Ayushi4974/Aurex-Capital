@@ -55,7 +55,7 @@ export default function LevelIncome({ user, isLiveMode, refreshTrigger }) {
 
       {/* Tabs */}
       <div style={{
-        display: 'flex', background: 'rgba(0,0,0,0.3)', padding: '6px', borderRadius: '10px',
+        display: 'flex', background: 'var(--input-bg)', padding: '6px', borderRadius: '10px',
         border: '1px solid var(--border-grey)', gap: '8px', maxWidth: '600px', flexWrap: 'wrap'
       }}>
         {['All', '1', '2', '3', '4', '5'].map(lvl => (

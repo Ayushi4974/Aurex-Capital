@@ -2,11 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useInView } from 'framer-motion';
 import { 
   Shield, TrendingUp, Users, Info, ChevronDown, MessageSquare, 
-  MapPin, Phone, Mail, Award, CheckCircle, Zap, HelpCircle, ArrowRight, X, Lock, Key,
+  MapPin, Phone, Mail, Award, CheckCircle, Zap, HelpCircle, ArrowRight, X, Lock, Key, Menu,
   Star, Globe, BarChart2, Cpu
 } from 'lucide-react';
-import Login from './Login';
-import Register from './Register';
+
 import AnimatedToken from '../components/AnimatedToken';
 import logoEmblem from '../assets/logo_emblem.png';
 import logoTransparent from '../assets/logo_transparent.png';
@@ -311,9 +310,7 @@ function SectionHeader({ badge, title, highlight }) {
 }
 
 /* ═══════════════════════════ MAIN COMPONENT ═══════════════════════════ */
-export default function Landing({ onAuthSuccess, isLiveMode }) {
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
+export default function Landing({ onAuthSuccess, isLiveMode, onNavigateToLogin, onNavigateToRegister }) {
   const [faqOpen, setFaqOpen] = useState({});
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const { scrollY } = useScroll();
@@ -321,6 +318,16 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isMouseOverHero, setIsMouseOverHero] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobileHeader = windowWidth < 992;
 
   const handleHeroMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -359,8 +366,8 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
 
   /* ── HOW IT WORKS STEPS ── */
   const steps = [
-    { num: '01', icon: <Key size={24} />, title: 'Register Account', desc: 'Sign up with a valid sponsor node ID and secure your placement in the binary genealogy tree.' },
-    { num: '02', icon: <Shield size={24} />, title: 'Deposit Funds', desc: 'Submit manual deposit receipt proofs to load liquid CapTok Main balances instantly.' },
+    { num: '01', icon: <Key size={24} />, title: 'Register Account', desc: 'Sign up with a valid sponsor ID and secure your placement in the binary genealogy tree.' },
+    { num: '02', icon: <Shield size={24} />, title: 'Deposit Funds', desc: 'Submit manual deposit receipt proofs to load liquid Fund Wallet balances instantly.' },
     { num: '03', icon: <Zap size={24} />, title: 'Stake Capital', desc: 'Lock capital in the FTP plan wizard to activate premium daily ROI slab yield cycles.' },
     { num: '04', icon: <TrendingUp size={24} />, title: 'Earn Daily ROI', desc: 'Collect daily returns and binary matching distributed straight to your ProTok profit wallet.' }
   ];
@@ -380,13 +387,13 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
     { icon: <Users size={28} />, title: '2. Unilevel Referrals', desc: 'Level 1: 10% | Level 2: 5% | Level 3: 2% | Levels 4–5: 1% commission on each downline stake.' },
     { icon: <Award size={28} />, title: '3. Binary Matching', desc: 'Earn 10% matching payout on matched Left/Right leg volumes daily. Unmatched carry forward automatically.' },
     { icon: <Star size={28} />, title: '4. Rank Milestone Rewards', desc: 'Unlock premium rewards — cash, travel vouchers, luxury goods — as your team volume hits rank milestones.' },
-    { icon: <BarChart2 size={28} />, title: '5. Pool & Loyalty Dividends', desc: 'Weekly UTP Profit pool distributed to qualified locked stakers. Loyalty dividends for long-term node holders.' },
+    { icon: <BarChart2 size={28} />, title: '5. Pool & Loyalty Dividends', desc: 'Weekly UTP Profit pool distributed to qualified locked stakers. Loyalty dividends for long-term account holders.' },
     { icon: <Globe size={28} />, title: '6. Fast-Track Bonus', desc: 'Earn bonus accelerator payouts when you personally sponsor two new actives in the same calendar week.' },
   ];
 
   /* ── STATS ── */
   const stats = [
-    { value: '74250', prefix: '', suffix: '+', label: 'Registered Nodes' },
+    { value: '74250', prefix: '', suffix: '+', label: 'Registered Accounts' },
     { value: '42.8M', prefix: '$', suffix: '', label: 'Active Investments' },
     { value: '0.35', prefix: '', suffix: '%', label: 'Max Daily ROI' },
     { value: '100', prefix: '', suffix: '%', label: 'Secure Contracts' },
@@ -397,7 +404,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
     { q: 'What is the wait period for DRP/FTP payouts?', a: 'Maturation begins exactly 7 days after the package creation timestamp to maintain platform liquidity and smart contract integrity.' },
     { q: 'What are the withdrawal limits and processing times?', a: 'Withdrawals require admin approval. Default transaction fee is 5%, and minimum threshold is $25 per request.' },
     { q: 'How does Binary Matching calculate commissions?', a: 'Commissions run daily at 1:00 AM, matching Left Leg and Right Leg volumes, rewarding 10% of matched volume to your wallet.' },
-    { q: 'Is a sponsor ID required during registration?', a: 'Yes — a valid parent sponsor node ID is required to position you correctly inside the MLM binary genealogy tree.' },
+    { q: 'Is a sponsor ID required during registration?', a: 'Yes — a valid parent sponsor ID is required to position you correctly inside the MLM binary genealogy tree.' },
     { q: 'Can I unstake capital before the contract expires?', a: 'Early unstaking is possible with a 10% penalty fee. All remaining ROI cycles are forfeited upon manual unstake.' },
   ];
 
@@ -416,61 +423,192 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
           backdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(255,255,255,0.05)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '18px 40px', flexWrap: 'wrap', gap: '16px'
+          padding: isMobileHeader ? '12px 20px' : '18px 40px',
+          flexWrap: isMobileHeader ? 'nowrap' : 'wrap',
+          gap: '16px'
         }}
       >
         <motion.div
           whileHover={{ scale: 1.03 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: isMobileHeader ? '10px' : '16px', cursor: 'pointer' }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <motion.div
             animate={{ boxShadow: ['0 0 8px rgba(212,175,55,0.3)', '0 0 20px rgba(212,175,55,0.6)', '0 0 8px rgba(212,175,55,0.3)'] }}
             transition={{ duration: 2.5, repeat: Infinity }}
-            style={{ width: '56px', height: '56px', borderRadius: '14px', border: '1px solid var(--gold-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(212,175,55,0.07)', overflow: 'hidden' }}
+            style={{ 
+              width: isMobileHeader ? '44px' : '56px', 
+              height: isMobileHeader ? '44px' : '56px', 
+              borderRadius: '14px', 
+              border: '1px solid var(--gold-primary)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              background: 'rgba(212,175,55,0.07)', 
+              overflow: 'hidden' 
+            }}
           >
-            <img src={logoEmblem} alt="Logo" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
+            <img src={logoEmblem} alt="Logo" style={{ width: isMobileHeader ? '30px' : '38px', height: isMobileHeader ? '30px' : '38px', objectFit: 'contain' }} />
           </motion.div>
           <div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '26px', lineHeight: 1.1, margin: 0, padding: 0 }} className="gold-text-gradient">Aurex Capital</h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: isMobileHeader ? '20px' : '26px', lineHeight: 1.1, margin: 0, padding: 0 }} className="gold-text-gradient">Aurex Capital</h3>
           </div>
         </motion.div>
 
-        <nav style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-          {navLinks.map((item, i) => (
-            <motion.button
-              key={item.id}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              whileHover={{ color: 'var(--gold-primary)', y: -1 }}
-              onClick={() => scrollToSection(item.id)}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-grey)', fontSize: '15.5px', fontWeight: 700, cursor: 'pointer', padding: '8px 12px', borderRadius: '6px', transition: 'all 0.2s' }}
-            >
-              {item.label}
-            </motion.button>
-          ))}
-        </nav>
+        {isMobileHeader ? (
+          <button
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-white)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '8px',
+              zIndex: 1001
+            }}
+          >
+            {mobileNavOpen ? <X size={24} style={{ color: 'var(--gold-primary)' }} /> : <Menu size={24} />}
+          </button>
+        ) : (
+          <>
+            <nav style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+              {navLinks.map((item, i) => (
+                <motion.button
+                  key={item.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ color: 'var(--gold-primary)', y: -1 }}
+                  onClick={() => scrollToSection(item.id)}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-grey)', fontSize: '15.5px', fontWeight: 700, cursor: 'pointer', padding: '8px 12px', borderRadius: '6px', transition: 'all 0.2s' }}
+                >
+                  {item.label}
+                </motion.button>
+              ))}
+            </nav>
 
-        <div style={{ display: 'flex', gap: '14px' }}>
-          <motion.button
-            whileHover={{ scale: 1.05, borderColor: 'var(--gold-primary)', color: 'var(--gold-primary)' }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
-            style={{ padding: '10px 24px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'white', borderRadius: '20px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            Sign In
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.07, boxShadow: '0 0 25px rgba(212,175,55,0.45)' }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}
-            style={{ padding: '10px 24px', border: 'none', background: 'linear-gradient(135deg, #c8a84b, #f0c040)', color: '#0a0800', borderRadius: '20px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer' }}
-          >
-            Register
-          </motion.button>
-        </div>
+            <div style={{ display: 'flex', gap: '14px' }}>
+              <motion.button
+                whileHover={{ scale: 1.05, borderColor: 'var(--gold-primary)', color: 'var(--gold-primary)' }}
+                whileTap={{ scale: 0.97 }}
+                onClick={onNavigateToLogin}
+                style={{ padding: '10px 24px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'white', borderRadius: '20px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s' }}
+              >
+                Sign In
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.07, boxShadow: '0 0 25px rgba(212,175,55,0.45)' }}
+                whileTap={{ scale: 0.97 }}
+                onClick={onNavigateToRegister}
+                style={{ padding: '10px 24px', border: 'none', background: 'linear-gradient(135deg, #c8a84b, #f0c040)', color: '#0a0800', borderRadius: '20px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer' }}
+              >
+                Register
+              </motion.button>
+            </div>
+          </>
+        )}
       </motion.header>
+
+      {/* Mobile Drawer Overlay */}
+      <AnimatePresence>
+        {isMobileHeader && mobileNavOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{
+              position: 'fixed',
+              top: '69px', // Below the sticky header (44px + 24px padding = 68px height)
+              left: 0,
+              right: 0,
+              background: 'rgba(5, 5, 5, 0.98)',
+              backdropFilter: 'blur(20px)',
+              borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
+              zIndex: 999,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '24px 30px',
+              gap: '20px',
+              boxShadow: '0 15px 30px rgba(0,0,0,0.9), 0 0 20px rgba(212, 175, 55, 0.1)'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {navLinks.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setMobileNavOpen(false);
+                    scrollToSection(item.id);
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-white)',
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    textAlign: 'left',
+                    padding: '10px 0',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+                    fontFamily: 'var(--font-display)'
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+              <button
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  onNavigateToLogin();
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  color: 'white',
+                  borderRadius: '30px',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  fontFamily: 'var(--font-display)'
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  onNavigateToRegister();
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #c8a84b, #f0c040)',
+                  color: '#0a0800',
+                  borderRadius: '30px',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  fontFamily: 'var(--font-display)'
+                }}
+              >
+                Register
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main style={{ position: 'relative', zIndex: 1 }}>
 
@@ -630,8 +768,8 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
                 transition={{ delay: 0.7 }}
                 style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}
               >
-                <GlowButton primary onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}>
-                  Create Node Account <ArrowRight size={16} />
+                <GlowButton primary onClick={onNavigateToRegister}>
+                  Create Free Account <ArrowRight size={16} />
                 </GlowButton>
                 <GlowButton onClick={() => scrollToSection('packages')}>
                   View Slab Plans
@@ -645,7 +783,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
                 transition={{ delay: 0.9 }}
                 style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '8px' }}
               >
-                {['Smart Contract Secured', 'KYC Verified Nodes', '24/7 Admin Support'].map((badge, i) => (
+                {['Smart Contract Secured', 'KYC Verified Members', '24/7 Admin Support'].map((badge, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-grey)' }}>
                     <CheckCircle size={13} style={{ color: '#34d399' }} />
                     {badge}
@@ -978,7 +1116,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
                     <motion.button
                       whileHover={{ scale: 1.05, boxShadow: `0 0 20px ${plan.color}40` }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}
+                      onClick={onNavigateToRegister}
                       style={{ padding: '12px 16px', background: `${plan.color}15`, border: `1px solid ${plan.color}50`, color: plan.color, borderRadius: '10px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, marginTop: '4px', transition: 'all 0.2s' }}
                     >
                       Get Started →
@@ -1189,10 +1327,10 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
               Ready to Start <span className="gold-text-gradient">Earning Daily?</span>
             </h2>
             <p style={{ color: 'var(--text-grey)', fontSize: '15px', marginBottom: '32px', position: 'relative' }}>
-              Join 74,000+ node stakers already earning daily ROI rewards on the Aurex Capital platform.
+              Join 74,000+ stakers already earning daily ROI rewards on the Aurex Capital platform.
             </p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', position: 'relative' }}>
-              <GlowButton primary onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}>
+              <GlowButton primary onClick={onNavigateToRegister}>
                 Create Free Account <ArrowRight size={16} />
               </GlowButton>
               <GlowButton onClick={() => scrollToSection('plan')}>
@@ -1219,75 +1357,7 @@ export default function Landing({ onAuthSuccess, isLiveMode }) {
         </div>
       </footer>
 
-      {/* ═══════════ AUTH MODAL ═══════════ */}
-      <AnimatePresence>
-        {showAuthModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(12px)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: -30, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: -30, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-              className="glass-card"
-              style={{ width: '100%', maxWidth: '450px', padding: '36px', position: 'relative', boxShadow: '0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(212,175,55,0.08)', border: '1px solid var(--border-gold)' }}
-            >
-              <motion.button
-                whileHover={{ scale: 1.1, rotate: 90, color: '#ef4444' }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setShowAuthModal(false)}
-                style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--text-grey)', cursor: 'pointer' }}
-              >
-                <X size={20} />
-              </motion.button>
 
-              <div style={{ display: 'flex', gap: '4px', marginBottom: '28px', background: 'rgba(0,0,0,0.3)', padding: '4px', borderRadius: '10px' }}>
-                {['login', 'register'].map(mode => (
-                  <motion.button
-                    key={mode}
-                    onClick={() => setAuthMode(mode)}
-                    whileTap={{ scale: 0.97 }}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      background: authMode === mode ? 'linear-gradient(135deg, #c8a84b, #f0c040)' : 'transparent',
-                      color: authMode === mode ? '#0a0800' : 'var(--text-grey)',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      transition: 'all 0.25s'
-                    }}
-                  >
-                    {mode === 'login' ? 'Sign In' : 'Register'}
-                  </motion.button>
-                ))}
-              </div>
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={authMode}
-                  initial={{ opacity: 0, x: authMode === 'login' ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: authMode === 'login' ? 20 : -20 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  {authMode === 'login' ? (
-                    <Login onAuthSuccess={onAuthSuccess} onNavigateToRegister={() => setAuthMode('register')} isLiveMode={isLiveMode} />
-                  ) : (
-                    <Register onAuthSuccess={onAuthSuccess} onNavigateToLogin={() => setAuthMode('login')} isLiveMode={isLiveMode} />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

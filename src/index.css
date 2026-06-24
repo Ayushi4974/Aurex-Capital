@@ -479,8 +479,8 @@ button, .btn {
 }
 
 .custom-auth-input {
-  background: rgba(10, 10, 10, 0.6) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: var(--input-bg) !important;
+  border: 1px solid var(--border-grey) !important;
   border-radius: 10px !important;
   color: var(--text-white) !important;
   font-family: var(--font-sans);
@@ -488,15 +488,20 @@ button, .btn {
 }
 
 .custom-auth-input:hover {
-  border-color: rgba(212, 175, 55, 0.4) !important;
-  background: rgba(15, 15, 15, 0.8) !important;
+  border-color: var(--border-gold) !important;
+  background: var(--input-bg) !important;
 }
 
 .custom-auth-input:focus {
   border-color: var(--gold-primary) !important;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.18) !important;
-  background: rgba(22, 20, 14, 0.85) !important;
+  box-shadow: 0 0 20px var(--gold-glow-strong) !important;
+  background: var(--input-focus-bg) !important;
   transform: translateY(-1px);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.8;
 }
 
 .input-group-wrapper:hover .input-icon,
@@ -517,6 +522,202 @@ button, .btn {
   background: linear-gradient(135deg, #ffffff 0%, var(--gold-bright) 60%, var(--gold-primary) 100%) !important;
   box-shadow: 0 6px 22px rgba(212, 175, 55, 0.45) !important;
 }
+
+/* ── Mobile Responsive Grid Helpers & Overrides ── */
+.responsive-grid-12-1 {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+}
+
+.responsive-grid-1-12 {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+}
+
+.responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.responsive-grid-15-1 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+}
+
+.responsive-grid-16-1 {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+}
+
+.responsive-grid-11-1 {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+}
+
+.responsive-grid-1-15 {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+}
+
+.responsive-grid-1-col {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.page-container {
+  padding: 28px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+.income-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 14px;
+}
+
+.mobile-scrollable-table {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+.page-header-card {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(0, 0, 0, 0.4) 100%);
+  border: 1px solid var(--border-gold);
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.05);
+}
+
+@media (max-width: 1024px) {
+  /* Force responsive grid helper classes to stack vertically on mobile */
+  .responsive-grid-12-1,
+  .responsive-grid-1-12,
+  .responsive-grid-3,
+  .responsive-grid-2,
+  .responsive-grid-15-1,
+  .responsive-grid-16-1,
+  .responsive-grid-11-1,
+  .responsive-grid-1-15 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-container {
+    padding: 16px !important;
+    gap: 20px !important;
+  }
+
+  /* Padding adjustments for pages on mobile */
+  .mobile-p-4 {
+    padding: 16px !important;
+  }
+
+  /* Font size overrides for mobile headings */
+  h1 {
+    font-size: 22px !important;
+  }
+  h2 {
+    font-size: 17px !important;
+  }
+
+  /* Hide cursor glow on touch devices */
+  .cursor-glow {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .page-header-card {
+    align-items: flex-start !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .income-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .responsive-table {
+    font-size: 11px !important;
+  }
+  .responsive-table th, 
+  .responsive-table td {
+    padding: 8px 6px !important;
+  }
+}
+
+/* Mobile Sidebar Drawer Styling */
+.mobile-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: -260px !important;
+  height: 100vh !important;
+  width: 260px !important;
+  z-index: 1000 !important;
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.8) !important;
+}
+
+.mobile-sidebar-open {
+  left: 0 !important;
+}
+
+/* Scrollable Horizontal Tabs on Mobile */
+.scrollable-tabs-container {
+  display: flex;
+  border-bottom: 1px solid var(--border-grey);
+  gap: 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.scrollable-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollable-tabs-container {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+
+
+
 
 
 

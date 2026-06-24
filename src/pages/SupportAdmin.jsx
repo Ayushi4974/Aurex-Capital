@@ -54,7 +54,7 @@ export default function SupportAdmin() {
         </p>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '28px', alignItems: 'start' }}>
+      <div className="responsive-grid-12-1" style={{ gap: '28px', alignItems: 'start' }}>
         
         {/* Tickets list */}
         <div className="glass-card" style={{ padding: '24px' }}>
@@ -106,7 +106,7 @@ export default function SupportAdmin() {
               <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '12px', color: 'var(--gold-primary)' }}>
                 Resolve Ticket {activeTicket.id}
               </h3>
-              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-grey)', marginBottom: '20px', fontSize: '13px' }}>
+              <div style={{ background: 'var(--input-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-grey)', marginBottom: '20px', fontSize: '13px' }}>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '4px' }}>SUBJECT:</p>
                 <p style={{ fontWeight: 600, marginBottom: '12px' }}>{activeTicket.subject}</p>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '4px' }}>USER INQUIRY:</p>

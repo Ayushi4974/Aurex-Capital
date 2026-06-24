@@ -49,6 +49,7 @@ import EarningsHistory from './pages/EarningsHistory';
 import RankRewards from './pages/RankRewards';
 import Support from './pages/Support';
 import Settings from './pages/Settings';
+import StakingPackages from './pages/StakingPackages';
 
 // Admin Protected Pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -133,7 +134,7 @@ function CanvasParticles() {
 export default function App() {
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [showRegister, setShowRegister] = useState(false);
+  const [authView, setAuthView] = useState(null);
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [apiOnline, setApiOnline] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -144,6 +145,19 @@ export default function App() {
 
   // Preset state for downline registration from binary hierarchy tree
   const [presetRegData, setPresetRegData] = useState(null);
+
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) setMobileMenuOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Apply data-theme to <html> element whenever theme changes
   useEffect(() => {
@@ -237,7 +251,7 @@ export default function App() {
   const handlePresetRegister = (presetData) => {
     setPresetRegData(presetData);
     handleLogout();
-    setShowRegister(true);
+    setAuthView('register');
   };
 
   const triggerRefresh = () => {
@@ -274,6 +288,8 @@ export default function App() {
         return <Profile user={user} />;
       case 'stake':
         return <Stake user={user} isLiveMode={isLiveMode} onRefreshUser={triggerRefresh} refreshTrigger={refreshTrigger} />;
+      case 'staking-packages':
+        return <StakingPackages user={user} isLiveMode={isLiveMode} onRefreshUser={triggerRefresh} refreshTrigger={refreshTrigger} />;
       case 'daily-roi':
         return <DailyROIHistory user={user} isLiveMode={isLiveMode} refreshTrigger={refreshTrigger} />;
       case 'referrals':
@@ -395,9 +411,37 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {!user ? (
-          <motion.div key="landing-portal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ width: '100%', zIndex: 10 }}>
-            <Landing onAuthSuccess={handleAuthSuccess} isLiveMode={isLiveMode} />
-          </motion.div>
+          authView === 'login' ? (
+            <motion.div key="login-portal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ width: '100%', zIndex: 10 }}>
+              <Login
+                onAuthSuccess={handleAuthSuccess}
+                onNavigateToRegister={() => setAuthView('register')}
+                isLiveMode={isLiveMode}
+                isModal={false}
+                onBackToHome={() => setAuthView(null)}
+              />
+            </motion.div>
+          ) : authView === 'register' ? (
+            <motion.div key="register-portal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ width: '100%', zIndex: 10 }}>
+              <Register
+                onAuthSuccess={handleAuthSuccess}
+                onNavigateToLogin={() => setAuthView('login')}
+                isLiveMode={isLiveMode}
+                isModal={false}
+                presetRegData={presetRegData}
+                onBackToHome={() => setAuthView(null)}
+              />
+            </motion.div>
+          ) : (
+            <motion.div key="landing-portal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ width: '100%', zIndex: 10 }}>
+              <Landing
+                onAuthSuccess={handleAuthSuccess}
+                isLiveMode={isLiveMode}
+                onNavigateToLogin={() => setAuthView('login')}
+                onNavigateToRegister={() => setAuthView('register')}
+              />
+            </motion.div>
+          )
         ) : (
           <motion.div 
             key="dashboard-shell" 
@@ -405,14 +449,28 @@ export default function App() {
             animate={{ opacity: 1 }} 
             className="dashboard-container"
             style={{ 
-              gridTemplateColumns: sidebarCollapsed ? '72px 1fr' : '260px 1fr', 
+              gridTemplateColumns: isMobile ? '1fr' : (sidebarCollapsed ? '72px 1fr' : '260px 1fr'), 
               transition: 'grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               zIndex: 10
             }}
           >
+            {/* Mobile Overlay Backdrop */}
+            {isMobile && mobileMenuOpen && (
+              <div 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                  backdropFilter: 'blur(4px)',
+                  zIndex: 999
+                }}
+              />
+            )}
+
             {/* Sidebar Navigation */}
             <aside 
-              className={`sidebar-transition ${sidebarCollapsed ? 'sidebar-collapsed-width' : 'sidebar-expanded-width'}`}
+              className={`sidebar-transition ${isMobile ? 'mobile-sidebar' : (sidebarCollapsed ? 'sidebar-collapsed-width' : 'sidebar-expanded-width')} ${isMobile && mobileMenuOpen ? 'mobile-sidebar-open' : ''}`}
               style={{
                 background: 'var(--bg-sidebar)',
                 borderRight: '1px solid var(--border-grey)',
@@ -420,11 +478,13 @@ export default function App() {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 height: '100vh',
-                position: 'sticky',
+                position: isMobile ? 'fixed' : 'sticky',
+                left: isMobile ? (mobileMenuOpen ? '0' : '-260px') : '0',
                 top: 0,
-                zIndex: 100,
+                zIndex: 1000,
+                width: '260px',
                 overflowY: 'auto',
-                transition: 'background 0.3s ease'
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               <div>
@@ -477,6 +537,7 @@ export default function App() {
                     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
                     { id: 'withdraw', label: 'Withdraw', icon: Wallet },
                     { id: 'stake', label: 'Investment / Stake', icon: Zap },
+                    { id: 'staking-packages', label: 'Staking Packages', icon: Layers },
                     { id: 'daily-roi', label: 'ROI History', icon: Calendar },
                     { id: 'referrals', label: 'Team / Referrals', icon: Users },
                     { id: 'hierarchy', label: 'Binary Tree', icon: GitFork },
@@ -491,7 +552,10 @@ export default function App() {
                     return (
                       <button
                         key={item.id}
-                        onClick={() => setCurrentPage(item.id)}
+                        onClick={() => {
+                          setCurrentPage(item.id);
+                          if (isMobile) setMobileMenuOpen(false);
+                        }}
                         className={`sidebar-nav-btn ${isActive ? 'active-tab' : ''}`}
                         style={{
                           display: 'flex', 
@@ -542,7 +606,10 @@ export default function App() {
                         return (
                           <button
                             key={item.id}
-                            onClick={() => setCurrentPage(item.id)}
+                            onClick={() => {
+                              setCurrentPage(item.id);
+                              if (isMobile) setMobileMenuOpen(false);
+                            }}
                             className={`sidebar-nav-btn ${isActive ? 'active-tab' : ''}`}
                             style={{
                               display: 'flex', 
@@ -629,6 +696,37 @@ export default function App() {
             {/* Main Content Body */}
             <main style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column', background: theme === 'light' ? 'var(--bg-main)' : 'radial-gradient(circle at top right, #0e0a02 0%, #050505 60%)', overflowY: 'auto', transition: 'background 0.3s ease' }}>
               
+              {/* Mobile Top Header */}
+              {isMobile && (
+                <header style={{
+                  height: '60px',
+                  background: 'rgba(13, 13, 13, 0.95)',
+                  borderBottom: '1px solid var(--border-grey)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0 20px',
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 900,
+                  backdropFilter: 'blur(10px)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button 
+                      onClick={() => setMobileMenuOpen(true)}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--text-white)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
+                    >
+                      <Menu size={22} />
+                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img src={logoEmblem} alt="Logo" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+                      <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '16px', color: 'var(--gold-primary)' }}>Aurex</span>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '11px', color: 'var(--text-grey)', fontWeight: 600 }}>{user.userId}</span>
+                </header>
+              )}
+              
               {/* Virtual Clock Display (Demo mode only) */}
 
 
@@ -651,7 +749,7 @@ export default function App() {
               <footer style={{
                 padding: '12px 24px',
                 borderTop: '1px solid var(--border-grey)',
-                background: 'rgba(5, 5, 5, 0.8)',
+                background: theme === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(5, 5, 5, 0.8)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -659,7 +757,8 @@ export default function App() {
                 color: 'var(--text-grey)',
                 backdropFilter: 'blur(8px)',
                 zIndex: 50,
-                marginTop: 'auto'
+                marginTop: 'auto',
+                transition: 'background 0.3s ease'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{
@@ -670,7 +769,7 @@ export default function App() {
                     display: 'inline-block',
                     boxShadow: '0 0 8px #10b981'
                   }} className="status-pill-pulse" />
-                  <span>Aurex Network Live: <strong>{isLiveMode ? 'Production Node' : 'Sandbox Node'}</strong></span>
+                  <span>Aurex Network Live: <strong>{isLiveMode ? 'Live Network' : 'Sandbox Network'}</strong></span>
                 </div>
                 
                 <div>
@@ -678,7 +777,7 @@ export default function App() {
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span>Theme: <strong style={{ color: 'var(--gold-primary)' }}>Gold Dark</strong></span>
+                  <span>Theme: <strong style={{ color: 'var(--gold-primary)' }}>{theme === 'light' ? 'Gold Light' : 'Gold Dark'}</strong></span>
                 </div>
               </footer>
             </main>

@@ -74,7 +74,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
   };
 
   const handleUnstake = async (stakeId, stakeAmount) => {
-    if (!window.confirm(`Are you sure you want to unstake $${stakeAmount}? Capital will be returned to CapTok Main.`)) {
+    if (!window.confirm(`Are you sure you want to unstake $${stakeAmount}? Capital will be returned to Fund Wallet.`)) {
       return;
     }
 
@@ -91,12 +91,14 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
   };
 
   const nexusTiers = [
-    { name: 'Nexus Start', price: 100, roi: '0.25%', desc: 'Ideal for basic node activation.' },
+    { name: 'Nexus Start', price: 100, roi: '0.25%', desc: 'Ideal for basic account activation.' },
     { name: 'Nexus Pro', price: 500, roi: '0.50%', desc: 'Accelerate unilevel tree overrides.' },
     { name: 'Nexus Elite', price: 1000, roi: '0.75%', desc: 'Premium yields, standard unilevel multipliers.' },
     { name: 'Nexus Titan', price: 5000, roi: '1.00%', desc: 'High ROI limits, extra global pool weights.' },
     { name: 'Nexus Infinity', price: 10000, roi: '2.00%', desc: 'Ultimate yields & direct leadership rankings.' }
   ];
+
+  const isLight = localStorage.getItem('aurex_theme') === 'light';
 
   return (
     <div style={{ padding: '28px', maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -107,43 +109,11 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
           Investment & <span className="gold-text-gradient">Nexus Staking</span>
         </h1>
         <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-          Select from our premium Nexus tiers, deploy CapTok funds, and track your 250% earnings capping progress.
+          Select from our premium Nexus tiers, deploy Fund Wallet, and track your 250% earnings capping progress.
         </p>
       </div>
 
-      {/* Nexus Tiers Show Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '20px'
-      }}>
-        {nexusTiers.map((tier, idx) => (
-          <motion.div 
-            key={idx}
-            whileHover={{ y: -6, scale: 1.025, transition: { duration: 0.2, ease: "easeOut" } }}
-            className="glass-card shifting-card nexus-tier-card" 
-            onClick={() => {
-              setAmount(tier.price.toString());
-              setPlanType('FTP');
-            }}
-            style={{
-              padding: '24px',
-              border: parseFloat(amount) === tier.price ? '1.5px solid var(--border-gold)' : '1px solid var(--border-grey)',
-              background: parseFloat(amount) === tier.price ? 'rgba(212, 175, 55, 0.05)' : 'rgba(0,0,0,0.3)',
-              position: 'relative',
-              cursor: 'pointer'
-            }}
-          >
-            <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-              <Zap size={14} style={{ color: parseFloat(amount) === tier.price ? 'var(--gold-primary)' : 'var(--text-muted)' }} />
-            </div>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--gold-primary)' }}>{tier.name}</h4>
-            <h2 style={{ fontSize: '24px', fontWeight: 800, marginTop: '8px' }}>${tier.price.toLocaleString()}</h2>
-            <p style={{ fontSize: '11px', color: '#34d399', fontWeight: 600, marginTop: '4px' }}>Daily ROI: {tier.roi}</p>
-            <p style={{ fontSize: '10.5px', color: 'var(--text-grey)', marginTop: '8px', lineHeight: '1.4' }}>{tier.desc}</p>
-          </motion.div>
-        ))}
-      </div>
+
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '28px' }}>
         
@@ -169,62 +139,126 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
               alignItems: 'center',
               marginBottom: '24px'
             }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-grey)' }}>Available CapTok Main:</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-grey)' }}>Available Fund Wallet:</span>
               <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--gold-primary)' }}>
                 ${wallet.captok.main.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
 
-            {/* Package Selection */}
+            {/* Package Selection — highlighted cards grid */}
             <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
+              <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '12px', fontWeight: 600, letterSpacing: '0.5px' }}>
                 SELECT PLAN PACKAGE
               </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {nexusTiers.map((tier) => {
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))',
+                gap: '10px',
+              }}>
+                {nexusTiers.map((tier, idx) => {
                   const isSelected = parseFloat(amount) === tier.price;
+                  const isHovered  = hoveredPackage === tier.name;
+                  // Give each tier a subtle accent colour for its badge
+                  const accentColors = ['#a78bfa','#60a5fa','#d4af37','#fb923c','#f472b6'];
+                  const accent = accentColors[idx];
+
                   return (
-                    <div
+                    <motion.div
                       key={tier.name}
-                      onClick={() => {
-                        setAmount(tier.price.toString());
-                        setPlanType('FTP');
-                      }}
-                      onMouseEnter={() => setHoveredPackage(tier.name)}
-                      onMouseLeave={() => setHoveredPackage(null)}
+                      onClick={() => { setAmount(tier.price.toString()); setPlanType('FTP'); }}
+                      onHoverStart={() => setHoveredPackage(tier.name)}
+                      onHoverEnd={() => setHoveredPackage(null)}
+                      whileHover={{ y: -4, scale: 1.03, transition: { duration: 0.18 } }}
+                      whileTap={{ scale: 0.97 }}
                       style={{
-                        padding: '12px 16px',
-                        borderRadius: '10px',
+                        position: 'relative',
+                        padding: '16px 14px',
+                        borderRadius: '14px',
                         cursor: 'pointer',
-                        border: isSelected 
-                          ? '1px solid var(--gold-primary)' 
-                          : (hoveredPackage === tier.name ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
-                        background: isSelected 
-                          ? 'rgba(212, 175, 55, 0.08)' 
-                          : (hoveredPackage === tier.name ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
-                        transition: 'all 0.2s',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        overflow: 'hidden',
+                        border: isSelected
+                          ? `1.5px solid ${accent}`
+                          : isHovered
+                            ? `1px solid ${accent}55`
+                            : '1px solid rgba(255,255,255,0.08)',
+                        background: isSelected
+                          ? (isLight ? `linear-gradient(135deg, ${accent}22 0%, rgba(255,255,255,0.9) 100%)` : `linear-gradient(135deg, ${accent}18 0%, rgba(0,0,0,0.4) 100%)`)
+                          : isHovered
+                            ? `${accent}0a`
+                            : 'rgba(255,255,255,0.03)',
+                        boxShadow: isSelected ? `0 0 18px ${accent}33` : 'none',
+                        backdropFilter: 'blur(8px)',
+                        transition: 'border 0.2s, background 0.2s, box-shadow 0.2s',
                       }}
                     >
-                      <div>
-                        <div style={{ fontWeight: 700, color: isSelected ? 'var(--gold-primary)' : 'var(--text-white)', fontSize: '14px' }}>
-                          {tier.name}
-                        </div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '2px' }}>
-                          {tier.desc}
-                        </div>
+                      {/* Glow blob top-right */}
+                      <div style={{
+                        position: 'absolute', top: '-14px', right: '-14px',
+                        width: '48px', height: '48px', borderRadius: '50%',
+                        background: accent, opacity: isSelected ? 0.18 : 0.07,
+                        filter: 'blur(14px)', pointerEvents: 'none',
+                        transition: 'opacity 0.2s',
+                      }} />
+
+                      {/* Selected tick badge */}
+                      {isSelected && (
+                        <div style={{
+                          position: 'absolute', top: '8px', right: '8px',
+                          width: '18px', height: '18px', borderRadius: '50%',
+                          background: accent,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '10px', color: '#000', fontWeight: 800,
+                        }}>✓</div>
+                      )}
+
+                      {/* Package name pill */}
+                      <div style={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '20px',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        background: `${accent}22`,
+                        color: accent,
+                        border: `1px solid ${accent}44`,
+                        marginBottom: '10px',
+                        letterSpacing: '0.3px',
+                      }}>
+                        {tier.name}
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 800, fontSize: '16px', color: isSelected ? 'var(--gold-primary)' : 'var(--text-white)' }}>
-                          ${tier.price.toLocaleString()}
-                        </div>
-                        <div style={{ fontSize: '10px', color: '#34d399', fontWeight: 650, marginTop: '2px' }}>
-                          Daily ROI: {tier.roi}
-                        </div>
+
+                      {/* Price */}
+                      <div style={{
+                        fontSize: '22px',
+                        fontWeight: 900,
+                        fontFamily: 'var(--font-display)',
+                        color: isSelected ? accent : 'var(--text-white)',
+                        lineHeight: 1,
+                        marginBottom: '6px',
+                        transition: 'color 0.2s',
+                      }}>
+                        ${tier.price.toLocaleString()}
                       </div>
-                    </div>
+
+                      {/* ROI */}
+                      <div style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: '#34d399',
+                        marginBottom: '6px',
+                      }}>
+                        ⚡ {tier.roi} Daily ROI
+                      </div>
+
+                      {/* Description */}
+                      <div style={{
+                        fontSize: '10px',
+                        color: 'var(--text-muted)',
+                        lineHeight: '1.4',
+                      }}>
+                        {tier.desc}
+                      </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -247,7 +281,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
                       : (hoveredNetwork === 'BEP20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
                     background: depositNetwork === 'BEP20' 
                       ? 'rgba(212, 175, 55, 0.08)' 
-                      : (hoveredNetwork === 'BEP20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                      : (hoveredNetwork === 'BEP20' ? 'rgba(212, 175, 55, 0.04)' : 'var(--input-bg)'),
                     transition: 'all 0.2s',
                     textAlign: 'center'
                   }}
@@ -266,7 +300,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
                       : (hoveredNetwork === 'TRC20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
                     background: depositNetwork === 'TRC20' 
                       ? 'rgba(212, 175, 55, 0.08)' 
-                      : (hoveredNetwork === 'TRC20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                      : (hoveredNetwork === 'TRC20' ? 'rgba(212, 175, 55, 0.04)' : 'var(--input-bg)'),
                     transition: 'all 0.2s',
                     textAlign: 'center'
                   }}
@@ -288,7 +322,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
                   value={depositNetwork === 'BEP20' ? '0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c' : 'TNVmB8GjS2fL6L5S6n9c3zF4vJqKmPnQrS'}
                   readOnly
                   className="form-input"
-                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '13px', color: 'var(--gold-primary)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-grey)' }}
+                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '13px', color: 'var(--gold-primary)', background: 'var(--input-bg)', border: '1px solid var(--border-grey)' }}
                 />
                 <button
                   type="button"
@@ -298,7 +332,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
                     alert(`${depositNetwork} deposit address copied to clipboard!`);
                   }}
                   className="btn btn-secondary"
-                  style={{ padding: '0 16px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', border: '1px solid var(--border-grey)', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '6px', cursor: 'pointer' }}
+                  style={{ padding: '0 16px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', border: '1px solid var(--border-grey)', background: 'var(--glass-bg)', color: 'var(--text-white)', borderRadius: '6px', cursor: 'pointer' }}
                 >
                   Copy
                 </button>

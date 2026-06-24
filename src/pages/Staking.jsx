@@ -79,7 +79,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
   };
 
   const handleUnstake = async (stakeId, stakeAmount) => {
-    if (!window.confirm(`Are you sure you want to unstake $${stakeAmount}? Capital will be returned to CapTok Main.`)) {
+    if (!window.confirm(`Are you sure you want to unstake $${stakeAmount}? Capital will be returned to Fund Wallet.`)) {
       return;
     }
 
@@ -93,7 +93,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
   };
 
   const nexusTiers = [
-    { name: 'Nexus Start', price: 100, roi: '0.25%', desc: 'Ideal for basic node activation.' },
+    { name: 'Nexus Start', price: 100, roi: '0.25%', desc: 'Ideal for basic account activation.' },
     { name: 'Nexus Pro', price: 500, roi: '0.50%', desc: 'Accelerate unilevel tree overrides.' },
     { name: 'Nexus Elite', price: 1000, roi: '0.75%', desc: 'Premium yields, standard unilevel multipliers.' },
     { name: 'Nexus Titan', price: 5000, roi: '1.00%', desc: 'High ROI limits, extra global pool weights.' },
@@ -151,7 +151,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
               alignItems: 'center',
               marginBottom: '24px'
             }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-grey)' }}>Available CapTok Balance:</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-grey)' }}>Available Fund Balance:</span>
               <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--gold-primary)' }}>
                 ${wallet.captok?.main.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
@@ -183,7 +183,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                           : (hoveredPackage === tier.name ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
                         background: isSelected 
                           ? 'rgba(212, 175, 55, 0.08)' 
-                          : (hoveredPackage === tier.name ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                          : (hoveredPackage === tier.name ? 'rgba(212, 175, 55, 0.04)' : 'var(--input-bg)'),
                         transition: 'all 0.2s',
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -229,7 +229,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                       : (hoveredNetwork === 'BEP20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
                     background: depositNetwork === 'BEP20' 
                       ? 'rgba(212, 175, 55, 0.08)' 
-                      : (hoveredNetwork === 'BEP20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                      : (hoveredNetwork === 'BEP20' ? 'rgba(212, 175, 55, 0.04)' : 'var(--input-bg)'),
                     transition: 'all 0.2s',
                     textAlign: 'center'
                   }}
@@ -248,7 +248,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                       : (hoveredNetwork === 'TRC20' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid var(--border-grey)'),
                     background: depositNetwork === 'TRC20' 
                       ? 'rgba(212, 175, 55, 0.08)' 
-                      : (hoveredNetwork === 'TRC20' ? 'rgba(212, 175, 55, 0.04)' : 'rgba(0, 0, 0, 0.2)'),
+                      : (hoveredNetwork === 'TRC20' ? 'rgba(212, 175, 55, 0.04)' : 'var(--input-bg)'),
                     transition: 'all 0.2s',
                     textAlign: 'center'
                   }}
@@ -270,7 +270,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                   value={depositNetwork === 'BEP20' ? '0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c' : 'TNVmB8GjS2fL6L5S6n9c3zF4vJqKmPnQrS'}
                   readOnly
                   className="form-input"
-                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '13px', color: 'var(--gold-primary)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-grey)' }}
+                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '13px', color: 'var(--gold-primary)', background: 'var(--input-bg)', border: '1px solid var(--border-grey)' }}
                 />
                 <button
                   type="button"
@@ -280,7 +280,7 @@ export default function Staking({ user, isLiveMode, onRefreshUser, refreshTrigge
                     alert(`${depositNetwork} deposit address copied to clipboard!`);
                   }}
                   className="btn btn-secondary"
-                  style={{ padding: '0 16px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', border: '1px solid var(--border-grey)', background: 'rgba(255,255,255,0.05)', color: 'white', borderRadius: '6px', cursor: 'pointer' }}
+                  style={{ padding: '0 16px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', border: '1px solid var(--border-grey)', background: 'var(--glass-bg)', color: 'var(--text-white)', borderRadius: '6px', cursor: 'pointer' }}
                 >
                   Copy
                 </button>

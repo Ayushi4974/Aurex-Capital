@@ -19,7 +19,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
         if (tree) {
           setTreeData(tree);
         } else {
-          setError(`Node ${rootNodeId} not found in the binary structure.`);
+          setError(`Account ${rootNodeId} not found in the binary structure.`);
         }
       } catch (err) {
         setError('Failed to fetch tree structure.');
@@ -230,7 +230,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
               cx={x - widthOffset}
               cy={nextY}
               r={16}
-              fill="rgba(0, 0, 0, 0.5)"
+              fill="var(--input-bg)"
               stroke="var(--border-grey)"
               strokeWidth={1.5}
             />
@@ -259,7 +259,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
               cx={x + widthOffset}
               cy={nextY}
               r={16}
-              fill="rgba(0, 0, 0, 0.5)"
+              fill="var(--input-bg)"
               stroke="var(--border-grey)"
               strokeWidth={1.5}
             />
@@ -299,7 +299,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
             Binary Tree <span className="gold-text-gradient">Visualizer</span>
           </h1>
           <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-            Drill down tree legs, inspect node metrics, and sponsor placements directly on the canvas
+            Drill down tree legs, inspect account metrics, and sponsor placements directly on the canvas
           </p>
         </div>
 
@@ -330,7 +330,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
                 type="text"
-                placeholder="Search Node ID..."
+                placeholder="Search Account ID..."
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
                 className="form-input"
@@ -362,7 +362,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
       <div className="glass-card" style={{
         padding: '24px',
         position: 'relative',
-        background: '#0a0a0a',
+        background: 'var(--glass-bg)',
         overflow: 'hidden',
         minHeight: '520px',
         border: '1px solid var(--border-grey)'
@@ -378,16 +378,16 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
           gap: '12px',
           zIndex: 10
         }}>
-          <span>✦ Clicking nodes sets them as Root</span>
+          <span>✦ Clicking accounts sets them as Root</span>
           <span>✦ Click "+" to add new downline register</span>
         </div>
 
         {/* Tree Container */}
         {treeData ? (
-          <div style={{
+          <div className="mobile-scrollable-table" style={{
+            position: 'relative',
             width: '100%',
-            overflowX: 'auto',
-            textAlign: 'center'
+            minHeight: '480px'
           }}>
             <svg
               width="1000"
@@ -403,6 +403,66 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
               {/* Draw Nodes */}
               {renderTreeNodes(treeData)}
             </svg>
+
+            {/* Custom Node Tooltip */}
+            <AnimatePresence>
+              {hoveredNode && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  style={{
+                    position: 'absolute',
+                    top: `${hoveredNode.y - 120}px`,
+                    left: `${hoveredNode.x > 700 ? hoveredNode.x - 220 : hoveredNode.x + 30}px`,
+                    width: '240px',
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid var(--border-gold)',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.15), 0 0 10px var(--gold-glow)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    zIndex: 100,
+                    textAlign: 'left'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--gold-primary)' }}>{hoveredNode.userId}</span>
+                    <span style={{
+                      fontSize: '9px',
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      fontWeight: 600,
+                      background: hoveredNode.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      color: hoveredNode.isActive ? '#34d399' : '#f87171'
+                    }}>
+                      {hoveredNode.isActive ? 'ACTIVE' : 'INACTIVE'}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '2px' }}>{hoveredNode.name}</p>
+                  <p style={{ fontSize: '11px', color: 'var(--text-grey)', marginBottom: '10px' }}>Rank: <strong>{hoveredNode.rank}</strong></p>
+                  
+                  <div className="responsive-grid-2" style={{ borderTop: '1px solid var(--border-grey)', paddingTop: '8px', gap: '8px', fontSize: '11px' }}>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)' }}>Left Vol:</span>
+                      <p style={{ fontWeight: 600 }}>${hoveredNode.leftBusiness.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)' }}>Right Vol:</span>
+                      <p style={{ fontWeight: 600 }}>${hoveredNode.rightBusiness.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)' }}>Self:</span>
+                      <p style={{ fontWeight: 600 }}>${hoveredNode.selfBusiness.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--text-muted)' }}>Team:</span>
+                      <p style={{ fontWeight: 600 }}>{hoveredNode.totalTeam} accounts</p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         ) : (
           <div style={{
@@ -415,66 +475,6 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
             Loading binary structure...
           </div>
         )}
-
-        {/* Custom Node Tooltip */}
-        <AnimatePresence>
-          {hoveredNode && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              style={{
-                position: 'absolute',
-                top: `${hoveredNode.y - 120}px`,
-                left: `${hoveredNode.x > 700 ? hoveredNode.x - 220 : hoveredNode.x + 30}px`,
-                width: '240px',
-                background: 'rgba(18, 18, 18, 0.95)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid var(--border-gold)',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.8), 0 0 10px var(--gold-glow)',
-                borderRadius: '12px',
-                padding: '16px',
-                zIndex: 100,
-                textAlign: 'left'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--gold-primary)' }}>{hoveredNode.userId}</span>
-                <span style={{
-                  fontSize: '9px',
-                  padding: '2px 6px',
-                  borderRadius: '10px',
-                  fontWeight: 600,
-                  background: hoveredNode.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                  color: hoveredNode.isActive ? '#34d399' : '#f87171'
-                }}>
-                  {hoveredNode.isActive ? 'ACTIVE' : 'INACTIVE'}
-                </span>
-              </div>
-              <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '2px' }}>{hoveredNode.name}</p>
-              <p style={{ fontSize: '11px', color: 'var(--text-grey)', marginBottom: '10px' }}>Rank: <strong>{hoveredNode.rank}</strong></p>
-              
-              <div style={{ borderTop: '1px solid var(--border-grey)', paddingTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px' }}>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Left Vol:</span>
-                  <p style={{ fontWeight: 600 }}>${hoveredNode.leftBusiness.toLocaleString()}</p>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Right Vol:</span>
-                  <p style={{ fontWeight: 600 }}>${hoveredNode.rightBusiness.toLocaleString()}</p>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Self:</span>
-                  <p style={{ fontWeight: 600 }}>${hoveredNode.selfBusiness.toLocaleString()}</p>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Team:</span>
-                  <p style={{ fontWeight: 600 }}>{hoveredNode.totalTeam} nodes</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );

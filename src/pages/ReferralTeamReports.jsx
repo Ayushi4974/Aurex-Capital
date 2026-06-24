@@ -90,7 +90,7 @@ export default function ReferralTeamReports() {
                   <td style={{ padding: '12px 6px', fontWeight: 600, color: 'var(--gold-primary)' }}>{r.userId}</td>
                   <td style={{ padding: '12px 6px', fontWeight: 600 }}>{r.name}</td>
                   <td style={{ padding: '12px 6px' }}>{r.sponsors} Users</td>
-                  <td style={{ padding: '12px 6px' }}>{r.totalTeam} Nodes</td>
+                  <td style={{ padding: '12px 6px' }}>{r.totalTeam} Members</td>
                   <td style={{ padding: '12px 6px', fontWeight: 700 }}>${r.selfStaked.toLocaleString()}</td>
                   <td style={{ padding: '12px 6px', color: 'var(--text-grey)' }}>${r.leftBusiness.toLocaleString()}</td>
                   <td style={{ padding: '12px 6px', color: 'var(--text-grey)' }}>${r.rightBusiness.toLocaleString()}</td>

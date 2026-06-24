@@ -185,7 +185,7 @@ export default function AdminSettings() {
               value={announcement}
               onChange={(e) => setAnnouncement(e.target.value)}
               className="form-input"
-              style={{ width: '100%', height: '80px', padding: '12px', background: 'rgba(0,0,0,0.3)', resize: 'vertical' }}
+              style={{ width: '100%', height: '80px', padding: '12px', resize: 'vertical' }}
               required
             />
           </div>

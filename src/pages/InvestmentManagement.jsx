@@ -33,7 +33,7 @@ export default function InvestmentManagement({ isLiveMode, refreshTrigger }) {
   }, [isLiveMode, refreshTrigger]);
 
   const handleCancelStake = async (stakeId) => {
-    if (!window.confirm(`Are you sure you want to terminate stake ${stakeId}? This will refund staker capital to their CapTok Main.`)) {
+    if (!window.confirm(`Are you sure you want to terminate stake ${stakeId}? This will refund staker capital to their Fund Wallet.`)) {
       return;
     }
 
@@ -68,7 +68,7 @@ export default function InvestmentManagement({ isLiveMode, refreshTrigger }) {
     }
 
     try {
-      // Force manual staking in mock DB (bypassing CapTok checks by directly pushing to stakes array)
+      // Force manual staking in mock DB (bypassing Fund Wallet checks by directly pushing to stakes array)
       const allStakes = JSON.parse(localStorage.getItem('aurex_stakes') || '[]');
       
       // Maturation details
@@ -145,11 +145,11 @@ export default function InvestmentManagement({ isLiveMode, refreshTrigger }) {
           Investment & <span className="gold-text-gradient">Stakes Management</span>
         </h1>
         <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-          Monitor platform active investments, trigger direct manual packages staking, or terminate node positions.
+          Monitor platform active investments, trigger direct manual packages staking, or terminate account positions.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '28px', alignItems: 'start' }}>
+      <div className="responsive-grid-12-1" style={{ gap: '28px', alignItems: 'start' }}>
         
         {/* Active Stakes List */}
         <div className="glass-card" style={{ padding: '24px' }}>
@@ -259,7 +259,7 @@ export default function InvestmentManagement({ isLiveMode, refreshTrigger }) {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '14px', marginBottom: '18px' }}>
+              <div className="responsive-grid-1-12" style={{ gap: '14px', marginBottom: '18px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px', fontWeight: 600 }}>PLAN TYPE</label>
                   <select

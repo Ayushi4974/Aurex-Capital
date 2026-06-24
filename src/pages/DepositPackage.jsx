@@ -55,17 +55,17 @@ export default function DepositPackage({ user, isLiveMode, onRefreshUser }) {
   };
 
   return (
-    <div style={{ padding: '28px', maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+    <div className="page-container">
       <div>
         <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }}>
           Deposit / <span className="gold-text-gradient">Buy Package</span>
         </h1>
         <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-          Load funds into your CapTok Main wallet using manual receipts verification
+          Load funds into your Fund Wallet wallet using manual receipts verification
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '28px', alignItems: 'start' }}>
+      <div className="responsive-grid-12-1" style={{ gap: '28px', alignItems: 'start' }}>
         
         {/* Form panel */}
         <div className="glass-card" style={{ padding: '24px' }}>
@@ -134,7 +134,7 @@ export default function DepositPackage({ user, isLiveMode, onRefreshUser }) {
             </div>
 
             {/* Wallet Destination Display */}
-            <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-grey)', padding: '14px', borderRadius: '8px', fontSize: '12px' }}>
+            <div style={{ background: 'var(--input-bg)', border: '1px solid var(--border-grey)', padding: '14px', borderRadius: '8px', fontSize: '12px' }}>
               <span style={{ color: 'var(--text-muted)' }}>SEND FUNDS TO THIS GATEWAY DESTINATION:</span>
               <p style={{ wordBreak: 'break-all', fontFamily: 'monospace', color: 'var(--gold-primary)', marginTop: '4px', fontWeight: 700 }}>
                 0x918F3aD343F818dE4DB98c575Ee693C6Cf56bc8c

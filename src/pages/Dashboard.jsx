@@ -503,9 +503,7 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
       </div>
 
       {/* Widgets & Activity Columns */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr',
+      <div className="responsive-grid-12-1" style={{
         gap: '24px',
         alignItems: 'start'
       }}>

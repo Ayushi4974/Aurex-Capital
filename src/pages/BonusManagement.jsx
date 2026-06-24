@@ -168,7 +168,7 @@ export default function BonusManagement({ isLiveMode, refreshTrigger }) {
         </p>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '28px', alignItems: 'start' }}>
+      <div className="responsive-grid-1-12" style={{ gap: '28px', alignItems: 'start' }}>
         
         {/* Manual Adjustments */}
         <motion.div

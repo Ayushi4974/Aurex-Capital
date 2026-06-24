@@ -4,7 +4,7 @@ import { Shield, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { api } from '../utils/api';
 import logoEmblem from '../assets/logo_emblem.png';
 
-export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode, isModal = true }) {
+export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode, isModal = true, onBackToHome }) {
   const [formData, setFormData] = useState({ userId: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -131,31 +131,41 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
         style={{ width: '100%', maxWidth: '440px', zIndex: 10 }}
       >
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '70px',
-            height: '70px',
-            borderRadius: '20px',
-            border: '2px solid var(--gold-primary)',
-            boxShadow: '0 0 25px var(--gold-glow-strong)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-            background: 'linear-gradient(135deg, #181818, #0a0a0a)'
-          }}>
+          <div 
+            onClick={onBackToHome}
+            style={{
+              width: '70px',
+              height: '70px',
+              borderRadius: '20px',
+              border: '2px solid var(--gold-primary)',
+              boxShadow: '0 0 25px var(--gold-glow-strong)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              background: 'linear-gradient(135deg, #181818, #0a0a0a)',
+              cursor: 'pointer'
+            }}
+          >
             <img src={logoEmblem} alt="Logo" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '30px' }} className="gold-text-gradient">SIGN IN</h2>
-          <p style={{ color: 'var(--text-grey)', fontSize: '13px', marginTop: '6px' }}>Secure Node Authentication portal</p>
+          <h2 
+            onClick={onBackToHome}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '30px', cursor: 'pointer' }} 
+            className="gold-text-gradient"
+          >
+            SIGN IN
+          </h2>
+          <p style={{ color: 'var(--text-grey)', fontSize: '13px', marginTop: '6px' }}>Secure Account Authentication portal</p>
         </div>
  
         <div className="glass-card auth-card" style={{ padding: '32px' }}>
           {notifications}
           {formContent}
           <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: 'var(--text-grey)' }}>
-            Don't have a node yet?{' '}
+            Don't have an account yet?{' '}
             <button onClick={onNavigateToRegister} style={{ background: 'transparent', border: 'none', color: 'var(--gold-primary)', fontWeight: 600, cursor: 'pointer' }}>
-              Register Node
+              Register Account
             </button>
           </div>
         </div>

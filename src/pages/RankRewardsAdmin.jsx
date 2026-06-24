@@ -19,11 +19,23 @@ export default function RankRewardsAdmin() {
     alert(`Rank reward for ${achId} approved and cash bonuses credited to staker!`);
   };
 
+  const milestoneRanks = [
+    { name: 'Scout Target', target: '$2,500 Team Business Volume', reward: 'Thailand Tour' },
+    { name: 'Ranger Target', target: '$5,000 Team Business Volume', reward: 'Malaysia Tour' },
+    { name: 'Explorer Target', target: '$10,000 Team Business Volume', reward: 'MacBook Reward' },
+    { name: 'Navigator Target', target: '$25,000 Team Business Volume', reward: 'iPhone Reward' },
+    { name: 'Visionary Target', target: '$50,000 Team Business Volume', reward: 'Dubai Trip + Luxury Watch' },
+    { name: 'Titan Target', target: '$100,000 Team Business Volume', reward: 'Car Fund' },
+    { name: 'Galaxy Target', target: '$250,000 Team Business Volume', reward: 'SUV / Premium Car Reward' },
+    { name: 'Nexus Crown Target', target: '$500,000 Team Business Volume', reward: 'Luxury Car Reward' },
+    { name: 'Quantum Legend Target', target: '$1,000,000 Team Business Volume', reward: 'Villa Fund' }
+  ];
+
   return (
-    <div style={{ padding: '28px', maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+    <div className="page-container">
       <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }}>
-          Rank & Rewards <span className="gold-text-gradient">Management</span>
+          Rank &amp; Rewards <span className="gold-text-gradient">Management</span>
         </h1>
         <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
           Verify qualifications criteria, monitor achievements, and process manual leadership rewards release
@@ -41,24 +53,16 @@ export default function RankRewardsAdmin() {
           <Trophy size={18} style={{ color: 'var(--gold-primary)' }} />
           Qualify Milestones Setup
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', fontSize: '12px', color: 'var(--text-grey)' }}>
-          <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-grey)', padding: '12px', borderRadius: '8px' }}>
-            <strong>Executive Target:</strong>
-            <p style={{ marginTop: '2px', color: 'white' }}>$5,000 Team Business Volume</p>
-            <p style={{ color: 'var(--gold-primary)', fontWeight: 700 }}>Reward: $250 Cash</p>
-          </div>
-          <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-grey)', padding: '12px', borderRadius: '8px' }}>
-            <strong>Manager Target:</strong>
-            <p style={{ marginTop: '2px', color: 'white' }}>$15,000 Team Business Volume</p>
-            <p style={{ color: 'var(--gold-primary)', fontWeight: 700 }}>Reward: $750 Travel Voucher</p>
-          </div>
-          <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-grey)', padding: '12px', borderRadius: '8px' }}>
-            <strong>Director Target:</strong>
-            <p style={{ marginTop: '2px', color: 'white' }}>$50,000 Team Business Volume</p>
-            <p style={{ color: 'var(--gold-primary)', fontWeight: 700 }}>Reward: Luxury Watch</p>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', fontSize: '12.5px', color: 'var(--text-grey)' }}>
+          {milestoneRanks.map((milestone) => (
+            <div key={milestone.name} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-grey)', padding: '14px', borderRadius: '10px' }}>
+              <strong>{milestone.name}:</strong>
+              <p style={{ marginTop: '2px', color: 'white' }}>{milestone.target}</p>
+              <p style={{ color: 'var(--gold-primary)', fontWeight: 700, marginTop: '4px' }}>Reward: {milestone.reward}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Actionable approvals */}
       <div className="glass-card" style={{ padding: '24px' }}>

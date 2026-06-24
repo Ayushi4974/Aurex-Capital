@@ -379,7 +379,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
   };
 
   return (
-    <div style={{ padding: '28px', maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+    <div className="page-container">
       
       {/* Title Header */}
       <div>
@@ -392,7 +392,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
       </div>
 
       {/* Grid: Overview dashboard + Sponsor Links */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', alignItems: 'stretch' }}>
+      <div className="responsive-grid-12-1" style={{ gap: '24px', alignItems: 'stretch' }}>
         
         {/* Team Overview Dashboard */}
         <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -400,7 +400,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
             <Activity size={18} /> Team Overview Dashboard
           </h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div className="responsive-grid-3" style={{ gap: '12px' }}>
             <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-grey)', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
               <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 700 }}>DIRECTS REFERRALS</span>
               <h3 style={{ fontSize: '20px', fontWeight: 800, marginTop: '4px' }}>{totalDirects}</h3>
@@ -426,7 +426,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px' }}>
+          <div className="responsive-grid-12-1" style={{ gap: '12px' }}>
             <div style={{ background: 'rgba(212,175,55,0.03)', border: '1px solid var(--border-gold)', padding: '12px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Unlock size={18} style={{ color: 'var(--gold-primary)' }} />
               <div>
@@ -450,14 +450,14 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
           <div>
             <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', color: 'var(--gold-primary)' }}>Referral Link & QR</h3>
             <p style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '2px' }}>
-              Recruit nodes under your direct sponsorship matrix.
+              Recruit members under your direct sponsorship matrix.
             </p>
           </div>
 
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            background: 'rgba(0, 0, 0, 0.4)',
+            background: 'var(--input-bg)',
             border: '1px solid var(--border-grey)',
             borderRadius: '8px',
             padding: '10px 14px',
@@ -518,7 +518,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
               />
             </div>
             <p style={{ fontSize: '11px', color: 'var(--text-grey)', lineHeight: '1.4' }}>
-              Let new nodes scan this QR code to quickly prefill Sponsor ID <strong style={{ color: 'var(--gold-primary)' }}>{user.userId}</strong> in register fields.
+              Let new members scan this QR code to quickly prefill Sponsor ID <strong style={{ color: 'var(--gold-primary)' }}>{user.userId}</strong> in register fields.
             </p>
           </div>
         </div>
@@ -526,7 +526,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
       </div>
 
       {/* Tabs navigation row */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border-grey)', gap: '16px' }}>
+      <div className="scrollable-tabs-container">
         {[
           { id: 'genealogy', label: 'Genealogy Tree', icon: Users },
           { id: 'level-view', label: 'Level View', icon: Layers },
@@ -553,7 +553,8 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                 fontWeight: isActive ? 700 : 600,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                outline: 'none'
+                outline: 'none',
+                flexShrink: 0
               }}
             >
               <Icon size={15} />
@@ -581,7 +582,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                   <div>
                     <h3 style={{ fontSize: '18px', fontFamily: 'var(--font-display)' }}>MLM Generation Tree</h3>
                     <p style={{ fontSize: '12px', color: 'var(--text-grey)', marginTop: '2px' }}>
-                      Expand nodes to view downlines. Click a node to view its direct team metrics and contact info.
+                      Expand members to view downlines. Click a member to view its direct team metrics and contact info.
                     </p>
                   </div>
                   
@@ -590,7 +591,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      background: 'rgba(0,0,0,0.3)',
+                      background: 'var(--input-bg)',
                       border: '1px solid var(--border-grey)',
                       borderRadius: '8px',
                       padding: '8px 12px',
@@ -627,11 +628,11 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                 </div>
 
                 {/* Tree and Sidebar Layout */}
-                <div style={{ display: 'grid', gridTemplateColumns: selectedMember ? '1.5fr 1fr' : '1fr', gap: '28px', alignItems: 'start' }}>
+                <div className={selectedMember ? "responsive-grid-15-1" : "responsive-grid-1-col"} style={{ gap: '28px', alignItems: 'start' }}>
                   
                   {/* Left Column: Recursive tree container */}
                   <div style={{ 
-                    background: 'rgba(0,0,0,0.15)', 
+                    background: 'var(--input-bg)', 
                     border: '1px solid var(--border-grey)', 
                     borderRadius: '12px', 
                     padding: '20px', 
@@ -699,7 +700,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                       </div>
                     ) : (
                       <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-                        No genealogy tree nodes found.
+                        No genealogy tree members found.
                       </p>
                     )}
                   </div>
@@ -751,7 +752,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-grey)' }}>Status</span>
                           <span style={{ color: selectedMember.isActive ? '#34d399' : '#f87171', fontWeight: 700 }}>
-                            {selectedMember.isActive ? 'Active Node' : 'Inactive Node'}
+                            {selectedMember.isActive ? 'Active Account' : 'Inactive Account'}
                           </span>
                         </div>
 
@@ -830,8 +831,8 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                       <div 
                         key={lvl} 
                         style={{ 
-                          background: isLocked ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.01)',
-                          border: isLocked ? '1px dashed rgba(255,255,255,0.06)' : '1px solid var(--border-grey)',
+                          background: isLocked ? 'var(--input-bg)' : 'transparent',
+                          border: isLocked ? '1px dashed var(--border-grey)' : '1px solid var(--border-grey)',
                           borderRadius: '10px',
                           overflow: 'hidden',
                           opacity: isLocked ? 0.6 : 1
@@ -890,7 +891,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
 
                         {/* Accordion Content table list */}
                         {!isLocked && isOpen && (
-                          <div style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid var(--border-grey)', overflowX: 'auto' }}>
+                          <div style={{ padding: '20px', background: 'var(--input-bg)', borderTop: '1px solid var(--border-grey)', overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
                               <thead>
                                 <tr style={{ borderBottom: '1px solid var(--border-grey)', textAlign: 'left', color: 'var(--text-muted)' }}>
@@ -985,7 +986,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                             }}
                           >
                             <td style={{ padding: '12px', fontWeight: 700 }}>L{lvl}</td>
-                            <td style={{ padding: '12px' }}>{membersCount} Nodes</td>
+                            <td style={{ padding: '12px' }}>{membersCount} Accounts</td>
                             <td style={{ padding: '12px', fontWeight: 700, color: isLocked ? 'var(--text-muted)' : 'var(--gold-primary)' }}>
                               ${businessVol.toLocaleString()}
                             </td>
@@ -1039,7 +1040,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                   });
 
                   return (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div className="responsive-grid-2" style={{ gap: '20px' }}>
                       <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '10px' }}>
                         <span style={{ fontSize: '11px', color: 'var(--text-grey)', display: 'block' }}>TOTAL GENERATION INCOME EARNED</span>
                         <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#34d399', marginTop: '4px' }}>
@@ -1156,16 +1157,16 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                     <Info size={16} style={{ color: 'var(--gold-primary)' }} /> Downline Growth Analytics
                   </h3>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div className="responsive-grid-2" style={{ gap: '24px' }}>
                     
                     {/* Active vs Inactive ratio */}
                     <div className="glass-card" style={{ padding: '20px' }}>
-                      <h4 style={{ fontSize: '13px', color: 'var(--text-white)', marginBottom: '14px' }}>Node Activity Ratios</h4>
+                      <h4 style={{ fontSize: '13px', color: 'var(--text-white)', marginBottom: '14px' }}>Account Activity Ratios</h4>
                       
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px' }}>
-                          <span style={{ color: '#34d399', fontWeight: 600 }}>Active Nodes ({activeTeamMembers})</span>
-                          <span style={{ color: '#f87171', fontWeight: 600 }}>Inactive Nodes ({inactiveTeamMembers})</span>
+                          <span style={{ color: '#34d399', fontWeight: 600 }}>Active Accounts ({activeTeamMembers})</span>
+                          <span style={{ color: '#f87171', fontWeight: 600 }}>Inactive Accounts ({inactiveTeamMembers})</span>
                         </div>
 
                         {/* Split progress bar */}
@@ -1179,7 +1180,7 @@ export default function Network({ user, isLiveMode, refreshTrigger }) {
                         )}
 
                         <p style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px', lineHeight: '1.4' }}>
-                          Active nodes have placed at least one stake inside Aurex capital tiers, contributing directly to unilevel overrides.
+                          Active accounts have placed at least one stake inside Aurex capital tiers, contributing directly to unilevel overrides.
                         </p>
                       </div>
                     </div>

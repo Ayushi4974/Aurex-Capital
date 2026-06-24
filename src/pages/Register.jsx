@@ -4,7 +4,7 @@ import { Shield, Mail, Lock, User, Phone, CheckCircle, AlertCircle } from 'lucid
 import { api } from '../utils/api';
 import logoEmblem from '../assets/logo_emblem.png';
 
-export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode, presetRegData, isModal = true }) {
+export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode, presetRegData, isModal = true, onBackToHome }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -185,7 +185,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
         className="btn custom-auth-btn" 
         style={{ width: '100%', padding: '14px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', height: '48px', marginTop: '10px', cursor: 'pointer' }}
       >
-        {loading ? 'Initializing Node...' : 'Register Node'}
+        {loading ? 'Initializing Account...' : 'Register Account'}
       </motion.button>
     </form>
   );
@@ -238,21 +238,31 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
         style={{ width: '100%', maxWidth: '460px', zIndex: 10 }}
       >
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{
-            width: '70px',
-            height: '70px',
-            borderRadius: '20px',
-            border: '2px solid var(--gold-primary)',
-            boxShadow: '0 0 25px var(--gold-glow-strong)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 12px',
-            background: 'linear-gradient(135deg, #181818, #0a0a0a)'
-          }}>
+          <div 
+            onClick={onBackToHome}
+            style={{
+              width: '70px',
+              height: '70px',
+              borderRadius: '20px',
+              border: '2px solid var(--gold-primary)',
+              boxShadow: '0 0 25px var(--gold-glow-strong)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 12px',
+              background: 'linear-gradient(135deg, #181818, #0a0a0a)',
+              cursor: 'pointer'
+            }}
+          >
             <img src={logoEmblem} alt="Logo" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }} className="gold-text-gradient">REGISTER NODE</h2>
+          <h2 
+            onClick={onBackToHome}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px', cursor: 'pointer' }} 
+            className="gold-text-gradient"
+          >
+            REGISTER ACCOUNT
+          </h2>
           <p style={{ color: 'var(--text-grey)', fontSize: '13px', marginTop: '4px' }}>
             Join the binary staking network
           </p>

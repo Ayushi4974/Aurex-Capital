@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Wallet, ListFilter, ArrowDownLeft, Clock } from 'lucide-react';
+import { Calendar, Wallet, ListFilter, ArrowDownLeft, Clock, Coins, TrendingUp, Sparkles, Activity, Award } from 'lucide-react';
 import { api } from '../utils/api';
+
+const iconBox = (Icon, color, bg) => (
+  <div style={{
+    width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: bg, border: `1px solid ${color}33`, boxShadow: `0 0 12px ${color}22`, flexShrink: 0
+  }}>
+    <Icon size={20} style={{ color }} />
+  </div>
+);
 
 export default function DailyROIHistory({ user, isLiveMode, refreshTrigger }) {
   const [roiLogs, setRoiLogs] = useState([]);
@@ -102,22 +111,28 @@ export default function DailyROIHistory({ user, isLiveMode, refreshTrigger }) {
         <motion.div 
           whileHover={{ y: -6, scale: 1.025, transition: { duration: 0.2, ease: "easeOut" } }}
           className="glass-card shifting-card" 
-          style={{ padding: '20px', borderLeft: '3px solid var(--gold-primary)' }}
+          style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '3px solid var(--gold-primary)' }}
         >
-          <span style={{ fontSize: '11px', color: 'var(--text-grey)', fontWeight: 600 }}>TODAY'S ROI REWARD</span>
-          <h3 style={{ fontSize: '24px', fontWeight: 700, marginTop: '6px', color: 'var(--gold-primary)' }}>
-            ${roiLogs.length > 0 ? roiLogs[roiLogs.length - 1].amount.toFixed(2) : '0.00'}
-          </h3>
+          {iconBox(Coins, 'var(--gold-primary)', 'rgba(212,175,55,0.08)')}
+          <div>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 750, letterSpacing: '0.5px' }}>TODAY'S ROI REWARD</span>
+            <h3 style={{ fontSize: '24px', fontWeight: 800, marginTop: '4px', color: 'var(--gold-primary)', fontFamily: 'var(--font-display)' }} className="gold-sheen-text">
+              ${roiLogs.length > 0 ? roiLogs[roiLogs.length - 1].amount.toFixed(2) : '0.00'}
+            </h3>
+          </div>
         </motion.div>
         <motion.div 
           whileHover={{ y: -6, scale: 1.025, transition: { duration: 0.2, ease: "easeOut" } }}
           className="glass-card shifting-card" 
-          style={{ padding: '20px', borderLeft: '3px solid #34d399' }}
+          style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '3px solid #34d399' }}
         >
-          <span style={{ fontSize: '11px', color: 'var(--text-grey)', fontWeight: 600 }}>CUMULATIVE ROI COLLECTED</span>
-          <h3 style={{ fontSize: '24px', fontWeight: 700, marginTop: '6px', color: '#34d399' }}>
-            ${totalROI.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </h3>
+          {iconBox(TrendingUp, '#34d399', 'rgba(52,211,153,0.08)')}
+          <div>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 755, letterSpacing: '0.5px' }}>CUMULATIVE ROI COLLECTED</span>
+            <h3 style={{ fontSize: '24px', fontWeight: 800, marginTop: '4px', color: '#34d399', fontFamily: 'var(--font-display)' }}>
+              ${totalROI.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </h3>
+          </div>
         </motion.div>
       </div>
 
@@ -144,7 +159,7 @@ export default function DailyROIHistory({ user, isLiveMode, refreshTrigger }) {
 
           {/* Quick Filters */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', padding: '4px', borderRadius: '8px', gap: '4px' }}>
+            <div style={{ display: 'flex', background: 'var(--input-bg)', padding: '4px', borderRadius: '8px', gap: '4px' }}>
               {[
                 { id: 'ALL', label: 'All Time' },
                 { id: 'today', label: 'Today' },
@@ -199,7 +214,7 @@ export default function DailyROIHistory({ user, isLiveMode, refreshTrigger }) {
                   value={customStart} 
                   onChange={(e) => setCustomStart(e.target.value)} 
                   className="form-input" 
-                  style={{ background: '#000', color: '#fff', fontSize: '12px' }} 
+                  style={{ fontSize: '12px' }} 
                 />
               </div>
               <div>
@@ -209,7 +224,7 @@ export default function DailyROIHistory({ user, isLiveMode, refreshTrigger }) {
                   value={customEnd} 
                   onChange={(e) => setCustomEnd(e.target.value)} 
                   className="form-input" 
-                  style={{ background: '#000', color: '#fff', fontSize: '12px' }} 
+                  style={{ fontSize: '12px' }} 
                 />
               </div>
             </motion.div>
@@ -243,31 +258,37 @@ export default function DailyROIHistory({ user, isLiveMode, refreshTrigger }) {
                 </tr>
               ) : (
                 filteredLogs.map(log => (
-                  <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                    <td style={{ padding: '12px 6px', color: 'var(--text-grey)' }}>
+                  <tr 
+                    key={log.id} 
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.15s ease' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <td style={{ padding: '12px 10px', color: 'var(--text-grey)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Clock size={12} style={{ color: 'var(--text-muted)' }} />
                         {new Date(log.createdAt).toLocaleDateString()}
                       </div>
                     </td>
-                    <td style={{ padding: '12px 6px', fontWeight: 600 }}>{log.packageName}</td>
-                    <td style={{ padding: '12px 6px', fontWeight: 600, color: 'var(--gold-primary)' }}>{log.roiPercentage}</td>
-                    <td style={{ padding: '12px 6px', fontWeight: 700, color: '#34d399' }}>
+                    <td style={{ padding: '12px 10px', fontWeight: 600 }}>{log.packageName}</td>
+                    <td style={{ padding: '12px 10px', fontWeight: 650, color: 'var(--gold-primary)' }}>{log.roiPercentage}</td>
+                    <td style={{ padding: '12px 10px', fontWeight: 700, color: '#34d399' }}>
                       +${log.amount.toFixed(2)}
                     </td>
-                    <td style={{ padding: '12px 6px' }}>
+                    <td style={{ padding: '12px 10px' }}>
                       <span style={{
-                        padding: '2px 6px',
+                        padding: '2.5px 7px',
                         borderRadius: '4px',
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: 700,
                         background: 'rgba(16, 185, 129, 0.08)',
-                        color: '#34d399'
-                      }}>
+                        color: '#34d399',
+                        border: '1px solid rgba(16, 185, 129, 0.15)'
+                      }} className="status-pill-pulse">
                         COMPLETED
                       </span>
                     </td>
-                    <td style={{ padding: '12px 6px', textAlign: 'right', fontWeight: 700, color: 'var(--gold-primary)' }}>
+                    <td style={{ padding: '12px 10px', textAlign: 'right', fontWeight: 700, color: 'var(--gold-primary)' }}>
                       ${log.runningTotal.toFixed(2)}
                     </td>
                   </tr>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Bell, Eye, EyeOff, CheckCircle, Lock, LogOut, Globe, Sun, Moon } from 'lucide-react';
+import { Shield, Bell, Eye, EyeOff, CheckCircle, Lock, LogOut, Globe, Sun, Moon, Settings as SettingsIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Settings({ user, theme, onThemeChange }) {
@@ -59,17 +59,26 @@ export default function Settings({ user, theme, onThemeChange }) {
   return (
     <div style={{ padding: '28px', width: '100%', display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
-      {/* Title */}
-      <div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }}>
-          Platform <span className="gold-text-gradient">Settings Portal</span>
-        </h1>
-        <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-          Configure multi-lingual options, transaction PIN authentication, and displays layout overrides.
-        </p>
+      {/* Title Header with Icon Box */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{
+          width: 52, height: 52, borderRadius: 14, background: 'rgba(212,175,55,0.1)',
+          border: '1px solid rgba(212,175,55,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 0 18px rgba(212,175,55,0.15)', flexShrink: 0
+        }}>
+          <SettingsIcon size={26} style={{ color: 'var(--gold-primary)' }} />
+        </div>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px' }}>
+            Platform <span className="gold-text-gradient">Settings Portal</span>
+          </h1>
+          <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
+            Configure platform preferences, security PIN credentials, and dark/light display layouts.
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '28px', alignItems: 'start' }}>
+      <div className="responsive-grid-11-1" style={{ gap: '28px', alignItems: 'start' }}>
         
         {/* Left Column: Security PIN & display */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -80,40 +89,46 @@ export default function Settings({ user, theme, onThemeChange }) {
             className="glass-card shifting-card" 
             style={{ padding: '24px' }}
           >
-            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--gold-primary)' }}>
-              <Lock size={18} />
+            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-white)' }}>
+              <Lock size={18} style={{ color: '#38bdf8' }} />
               Transaction Security PIN
             </h3>
             <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>PIN Status: <strong>{pinStatus}</strong></span>
 
-            <form onSubmit={handlePinSubmit} style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <form onSubmit={handlePinSubmit} style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>NEW 4-DIGIT PIN</label>
-                <input
-                  type="password"
-                  maxLength="4"
-                  placeholder="xxxx"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  className="form-input"
-                  style={{ width: '100px', textAlign: 'center', fontSize: '18px', fontWeight: 800, letterSpacing: '4px' }}
-                  required
-                />
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>NEW 4-DIGIT PIN</label>
+                <div className="input-group-wrapper" style={{ position: 'relative', width: '200px' }}>
+                  <Lock size={14} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
+                  <input
+                    type="password"
+                    maxLength="4"
+                    placeholder="Enter 4-digit PIN"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    className="form-input custom-auth-input"
+                    style={{ paddingLeft: '40px', fontSize: '14px', fontWeight: 600, letterSpacing: '2px', height: '42px', width: '100%' }}
+                    required
+                  />
+                </div>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '4px' }}>CONFIRM PIN</label>
-                <input
-                  type="password"
-                  maxLength="4"
-                  placeholder="xxxx"
-                  value={confirmPin}
-                  onChange={(e) => setConfirmPin(e.target.value)}
-                  className="form-input"
-                  style={{ width: '100px', textAlign: 'center', fontSize: '18px', fontWeight: 800, letterSpacing: '4px' }}
-                  required
-                />
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-grey)', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.7px' }}>CONFIRM PIN</label>
+                <div className="input-group-wrapper" style={{ position: 'relative', width: '200px' }}>
+                  <Lock size={14} className="input-icon" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', transition: 'all 0.3s ease', zIndex: 10 }} />
+                  <input
+                    type="password"
+                    maxLength="4"
+                    placeholder="Confirm PIN"
+                    value={confirmPin}
+                    onChange={(e) => setConfirmPin(e.target.value)}
+                    className="form-input custom-auth-input"
+                    style={{ paddingLeft: '40px', fontSize: '14px', fontWeight: 600, letterSpacing: '2px', height: '42px', width: '100%' }}
+                    required
+                  />
+                </div>
               </div>
-              <button type="submit" className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '12px', alignSelf: 'flex-start', fontWeight: 700 }}>
+              <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '12.5px', alignSelf: 'flex-start', fontWeight: 700, borderRadius: '6px' }}>
                 Set PIN Code
               </button>
             </form>
@@ -125,8 +140,8 @@ export default function Settings({ user, theme, onThemeChange }) {
             className="glass-card shifting-card" 
             style={{ padding: '24px' }}
           >
-            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Eye size={18} style={{ color: 'var(--gold-primary)' }} />
+            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-white)' }}>
+              <Eye size={18} style={{ color: '#fb923c' }} />
               Display Layout Mode
             </h3>
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -199,8 +214,8 @@ export default function Settings({ user, theme, onThemeChange }) {
             className="glass-card shifting-card" 
             style={{ padding: '24px' }}
           >
-            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Globe size={18} style={{ color: 'var(--gold-primary)' }} />
+            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-white)' }}>
+              <Globe size={18} style={{ color: '#60a5fa' }} />
               Preferred Language
             </h3>
             <select 
@@ -222,8 +237,8 @@ export default function Settings({ user, theme, onThemeChange }) {
             className="glass-card shifting-card" 
             style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}
           >
-            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bell size={18} style={{ color: 'var(--gold-primary)' }} />
+            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-white)' }}>
+              <Bell size={18} style={{ color: '#a78bfa' }} />
               System Alert Preferences
             </h3>
 
@@ -269,8 +284,8 @@ export default function Settings({ user, theme, onThemeChange }) {
             className="glass-card shifting-card" 
             style={{ padding: '24px' }}
           >
-            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171' }}>
-              <LogOut size={18} />
+            <h3 style={{ fontSize: '16px', fontFamily: 'var(--font-display)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-white)' }}>
+              <LogOut size={18} style={{ color: '#f87171' }} />
               Active Sessions Override
             </h3>
             <p style={{ fontSize: '11px', color: 'var(--text-grey)', marginBottom: '16px', lineHeight: '1.4' }}>

@@ -55,7 +55,7 @@ export default function Admin({ isLiveMode, onRefreshUser, refreshTrigger }) {
     setActionLoading(true);
     try {
       await api.adminApproveDeposit(txId, isLiveMode);
-      showMsg('success', 'Deposit request approved successfully. Funds credited to CapTok Main.');
+      showMsg('success', 'Deposit request approved successfully. Funds credited to Fund Wallet.');
       fetchAdminData();
       onRefreshUser();
     } catch (err) {
@@ -154,7 +154,7 @@ export default function Admin({ isLiveMode, onRefreshUser, refreshTrigger }) {
           Admin & <span className="gold-text-gradient">Control Center</span>
         </h1>
         <p style={{ color: 'var(--text-grey)', fontSize: '14px', marginTop: '4px' }}>
-          Approve transactions, declare weekly profit shares, and manage node registrations
+          Approve transactions, declare weekly profit shares, and manage member registrations
         </p>
       </div>
 
@@ -187,7 +187,7 @@ export default function Admin({ isLiveMode, onRefreshUser, refreshTrigger }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '20px' }}>
             {/* Clock display */}
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-grey)' }}>
+            <div style={{ background: 'var(--input-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-grey)' }}>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>VIRTUAL SYSTEM TIME</span>
               <h4 style={{ fontSize: '18px', fontWeight: 700, marginTop: '4px', color: 'var(--gold-primary)' }}>
                 {vDate.toDateString()}
@@ -360,7 +360,7 @@ export default function Admin({ isLiveMode, onRefreshUser, refreshTrigger }) {
       {/* Users table list */}
       <div className="glass-card" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '18px', fontFamily: 'var(--font-display)', marginBottom: '20px' }}>
-          Registered Downline Nodes ({users.length})
+          Registered Downline Accounts ({users.length})
         </h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '900px' }}>
@@ -371,7 +371,7 @@ export default function Admin({ isLiveMode, onRefreshUser, refreshTrigger }) {
                 <th style={{ padding: '10px 6px' }}>Sponsor</th>
                 <th style={{ padding: '10px 6px' }}>Parent (Tree)</th>
                 <th style={{ padding: '10px 6px' }}>Leg</th>
-                <th style={{ padding: '10px 6px' }}>CapTok Main</th>
+                <th style={{ padding: '10px 6px' }}>Fund Wallet</th>
                 <th style={{ padding: '10px 6px' }}>ProTok Profit</th>
                 <th style={{ padding: '10px 6px' }}>Left Business</th>
                 <th style={{ padding: '10px 6px' }}>Right Business</th>

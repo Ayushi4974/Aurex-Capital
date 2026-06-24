@@ -603,10 +603,10 @@ export const dbInvest = (userId, planType, amount) => {
   if (planType === 'UTP' && amount % 50 !== 0) throw new Error('Unit Token Plan must be in multiples of $50');
 
   if (user.wallet.captok.main < amount) {
-    throw new Error(`Insufficient CapTok balance. Available: $${user.wallet.captok.main}`);
+    throw new Error(`Insufficient Fund Balance. Available: $${user.wallet.captok.main}`);
   }
 
-  // Deduct from Main CapTok and move to Used
+  // Deduct from Main Fund Wallet and move to Used
   user.wallet.captok.main -= amount;
   user.wallet.captok.used += amount;
   user.business.self += amount;
@@ -701,7 +701,7 @@ export const dbUnstake = (stakeId) => {
   const user = db.users.find(u => u.userId === stake.userId);
   if (!user) throw new Error('User not found');
 
-  // Refund from CapTok Used to CapTok Main
+  // Refund from Fund Wallet Used to Fund Wallet
   user.wallet.captok.used -= stake.amount;
   user.wallet.captok.main += stake.amount;
   user.business.self -= stake.amount;
@@ -734,7 +734,7 @@ export const dbTransfer = (senderId, receiverId, amount) => {
   if (!sender) throw new Error('Sender not found');
   if (!receiver) throw new Error('Receiver not found');
   if (amount <= 0) throw new Error('Transfer amount must be positive');
-  if (sender.wallet.captok.main < amount) throw new Error('Insufficient CapTok balance');
+  if (sender.wallet.captok.main < amount) throw new Error('Insufficient Fund Balance');
 
   sender.wallet.captok.main -= amount;
   receiver.wallet.captok.main += amount;
@@ -802,7 +802,7 @@ export const dbBuyImx = (userId, amount) => {
     type: 'Deposit',
     status: 'Completed',
     createdAt: db.virtualDate.toISOString(),
-    description: `Purchased IMX tokens and credited $${amount} to CapTok`
+    description: `Purchased IMX tokens and credited $${amount} to Fund Wallet`
   });
 
   saveDb(db);
