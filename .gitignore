@@ -17,7 +17,6 @@ backend/node_modules
 backend/.env
 
 # GitHub Actions (requires workflow scope - add manually on GitHub)
-.github/workflows/
 
 # Editor directories and files
 .vscode/*
