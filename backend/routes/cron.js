@@ -3,11 +3,12 @@ const router = express.Router();
 
 // Dev-only manual cron triggers
 const { distributeROI, checkCaps } = require('../services/roiService');
+const { distributeLoyaltyBoosters } = require('../services/loyaltyService');
 const { releaseMaturedStakes } = require('../services/stakingService');
 const { processAutoCompound } = require('../services/compoundService');
 const { expireOldBoosters } = require('../services/boosterService');
 const { distributeWeeklyPool } = require('../services/momentumService');
-const { checkAndUpdate } = require('../services/rankService');
+const { checkAndUpdate, checkVelocityFastTrack } = require('../services/rankService');
 const { resetDailyLimits } = require('../services/withdrawService');
 const User = require('../models/User');
 const Session = require('../models/Session');
@@ -47,7 +48,10 @@ router.post('/booster-expiry', async (req, res) => {
 
 router.post('/rank-check', async (req, res) => {
   const users = await User.find({ role: 'user' });
-  for (const u of users) await checkAndUpdate(u.userId);
+  for (const u of users) {
+    await checkAndUpdate(u.userId);
+    await checkVelocityFastTrack(u.userId);
+  }
   res.json({ success: true, job: 'rank-check', checked: users.length });
 });
 
@@ -75,6 +79,11 @@ router.post('/notification-cleanup', async (req, res) => {
   const cutoff = new Date(Date.now() - 30 * 24 * 3600000); // 30 days
   const deleted = await Notification.deleteMany({ read: true, createdAt: { $lt: cutoff } });
   res.json({ success: true, job: 'notification-cleanup', deleted: deleted.deletedCount });
+});
+
+router.post('/loyalty-check', async (req, res) => {
+  const result = await distributeLoyaltyBoosters();
+  res.json({ success: true, job: 'loyalty-check', ...result });
 });
 
 module.exports = router;

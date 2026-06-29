@@ -7,6 +7,7 @@
 const Investment = require('../models/Investment');
 const ROIHistory = require('../models/ROIHistory');
 const InvestmentHistory = require('../models/InvestmentHistory');
+const BinaryTree = require('../models/BinaryTree');
 const { creditWallet } = require('./mlmService');
 const notificationService = require('./notificationService');
 
@@ -32,7 +33,8 @@ const distributeROI = async () => {
 
   for (const inv of investments) {
     try {
-      const rate = getROIRate(inv.amount);
+      let rate = getROIRate(inv.amount);
+      rate = parseFloat((rate + (inv.roiPercent || 0)).toFixed(6));
       let roiAmount = parseFloat((inv.amount * rate).toFixed(4));
 
       const remaining = inv.earningCap - inv.roiEarned;

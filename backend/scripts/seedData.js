@@ -68,21 +68,19 @@ const seed = async () => {
 
     // ─── Rank Reward Catalog ─────────────────────────────
     const ranks = [
-      { rankName: 'Member',        requiredBusiness: 0,       rewardType: 'cash',   bonusAmount: 0,      rewardValueUSD: 0 },
-      { rankName: 'Scout',         requiredBusiness: 2500,    rewardType: 'cash',   bonusAmount: 50,     rewardValueUSD: 50,    rewardDescription: '$50 Cash Bonus' },
-      { rankName: 'Ranger',        requiredBusiness: 5000,    rewardType: 'cash',   bonusAmount: 100,    rewardValueUSD: 100,   rewardDescription: '$100 Cash Bonus' },
-      { rankName: 'Explorer',      requiredBusiness: 10000,   rewardType: 'gadget', bonusAmount: 200,    rewardValueUSD: 200,   rewardDescription: 'Laptop / Gadget Reward' },
-      { rankName: 'Navigator',     requiredBusiness: 25000,   rewardType: 'tour',   bonusAmount: 500,    rewardValueUSD: 500,   rewardDescription: 'International Tour Package' },
-      { rankName: 'Visionary',     requiredBusiness: 50000,   rewardType: 'car',    bonusAmount: 2500,   rewardValueUSD: 15000, rewardDescription: 'Luxury Car + $2,500 Bonus' },
-      { rankName: 'Titan',         requiredBusiness: 100000,  rewardType: 'car',    bonusAmount: 5000,   rewardValueUSD: 30000, rewardDescription: 'Super Car + $5,000 Bonus' },
-      { rankName: 'Galaxy',        requiredBusiness: 250000,  rewardType: 'villa',  bonusAmount: 10000,  rewardValueUSD: 100000,rewardDescription: 'Villa + $10,000 Bonus' },
-      { rankName: 'Nexus Crown',   requiredBusiness: 500000,  rewardType: 'villa',  bonusAmount: 25000,  rewardValueUSD: 250000,rewardDescription: 'Luxury Villa + $25,000 Bonus' },
-      { rankName: 'Quantum Legend',requiredBusiness: 1000000, rewardType: 'villa',  bonusAmount: 50000,  rewardValueUSD: 500000,rewardDescription: 'Mega Villa + $50,000 Bonus' },
+      { rankName: 'Member',        requiredBusiness: 0,        rewardType: 'cash',   bonusAmount: 0,    rewardValueUSD: 0 },
+      { rankName: 'Explorer',      requiredBusiness: 10000,    rewardType: 'cash',   bonusAmount: 100,  rewardValueUSD: 100,    rewardDescription: '$100 Cash Bonus' },
+      { rankName: 'Navigator',     requiredBusiness: 50000,    rewardType: 'cash',   bonusAmount: 500,  rewardValueUSD: 500,    rewardDescription: '$500 Cash Bonus' },
+      { rankName: 'Pioneer',       requiredBusiness: 100000,   rewardType: 'gadget', bonusAmount: 0,    rewardValueUSD: 1200,   rewardDescription: 'MacBook' },
+      { rankName: 'Visionary',     requiredBusiness: 500000,   rewardType: 'tour',   bonusAmount: 0,    rewardValueUSD: 5000,   rewardDescription: 'Dubai Trip' },
+      { rankName: 'Titan',         requiredBusiness: 1000000,  rewardType: 'fund',   bonusAmount: 0,    rewardValueUSD: 25000,  rewardDescription: 'Car Fund' },
+      { rankName: 'Galaxy',        requiredBusiness: 5000000,  rewardType: 'car',    bonusAmount: 0,    rewardValueUSD: 60000,  rewardDescription: 'Luxury Car' },
+      { rankName: 'Nexus Crown',   requiredBusiness: 10000000, rewardType: 'villa',  bonusAmount: 0,    rewardValueUSD: 200000, rewardDescription: 'Villa Fund' },
     ];
     for (const r of ranks) {
       await RankRewardCatalog.findOneAndUpdate({ rankName: r.rankName }, r, { upsert: true });
     }
-    console.log('✅ 10 rank reward catalog entries seeded');
+    console.log('✅ 8 rank reward catalog entries seeded');
 
     // ─── System Config ────────────────────────────────────
     const configExists = await SystemConfig.findOne();

@@ -1,94 +1,96 @@
 /**
- * Booster Service
- * 48-hour window: if user makes a second investment same or higher package
- * within 48h of the first, the first investment amount is unlocked (credited to wallet).
+ * QNR Power Nodes Booster Service
+ * Instead of personal second investments, QNR checks binary tree downline nodes.
+ * 5 Nodes: +0.05% ROI
+ * 20 Nodes: +0.10% ROI
+ * 50 Nodes: +0.20% ROI
+ * 100 Nodes: +0.30% ROI
  */
 
-const BoosterIncome = require('../models/BoosterIncome');
+const User = require('../models/User');
 const Investment = require('../models/Investment');
-const { creditWallet } = require('./mlmService');
-const notificationService = require('./notificationService');
+const BinaryTree = require('../models/BinaryTree');
 
-const BOOSTER_HOURS = 48;
+/**
+ * Calculates the current Power Nodes ROI booster rate for a user.
+ */
+const calculateNodeBooster = async (userId) => {
+  const userNode = await BinaryTree.findOne({ userId });
+  if (!userNode) return 0;
 
-// Called when a new investment is made — check/setup booster
-const checkAndSetupBooster = async (userId, investmentId, amount, purchaseDate) => {
-  // Check if there is an existing pending booster for this user
-  const existingBooster = await BoosterIncome.findOne({ userId, status: 'pending' });
+  // Count all descendants in the binary tree path
+  const descendants = await BinaryTree.countDocuments({
+    path: { $regex: new RegExp(`^${userNode.path}/`) }
+  });
 
-  if (!existingBooster) {
-    // First investment — create pending booster record
-    const expiry = new Date(purchaseDate);
-    expiry.setHours(expiry.getHours() + BOOSTER_HOURS);
+  if (descendants >= 100) return 0.0030;      // +0.30%
+  if (descendants >= 50) return 0.0020;       // +0.20%
+  if (descendants >= 20) return 0.0010;       // +0.10%
+  if (descendants >= 5) return 0.0005;        // +0.05%
+  return 0;
+};
 
-    await BoosterIncome.create({
-      userId,
-      investment1: { investmentId, amount, date: purchaseDate },
-      expiry, status: 'pending'
-    });
-    // Mark the investment as booster eligible
-    await Investment.findOneAndUpdate({ investmentId }, { boostEligible: true, boostStatus: 'pending' });
-  } else {
-    // Second investment — check if within 48h window and same or higher package
-    const now = new Date();
-    if (now > existingBooster.expiry) {
-      existingBooster.status = 'expired';
-      await existingBooster.save();
-      await Investment.findOneAndUpdate(
-        { investmentId: existingBooster.investment1.investmentId },
-        { boostStatus: 'expired' }
-      );
-      return;
+/**
+ * Reconciles and updates active investments for a specific user.
+ */
+const reconcilePowerNodesForUser = async (userId) => {
+  const boosterRate = await calculateNodeBooster(userId);
+  const activeInvestments = await Investment.find({ userId, status: 'active' });
+  let updated = 0;
+  for (const inv of activeInvestments) {
+    if (inv.roiPercent !== boosterRate) {
+      inv.roiPercent = boosterRate;
+      await inv.save();
+      updated++;
     }
+  }
+  return updated;
+};
 
-    if (amount >= existingBooster.investment1.amount) {
-      // Booster activated!
-      existingBooster.investment2 = { investmentId, amount, date: purchaseDate };
-      existingBooster.unlockAmount = existingBooster.investment1.amount;
-      existingBooster.eligible = true;
-      existingBooster.claimed = true;
-      existingBooster.status = 'completed';
-      await existingBooster.save();
+/**
+ * Reconciles and updates all active investments across all users.
+ */
+const reconcilePowerNodes = async () => {
+  const activeInvestments = await Investment.find({ status: 'active' });
+  let updated = 0;
+  const userCache = {}; // Cache calculations during batch runs
 
-      // Credit first investment amount to earningBalance
-      await creditWallet(userId, 'earningBalance', existingBooster.unlockAmount, 'booster',
-        `Booster income: investment #1 ($${existingBooster.unlockAmount}) unlocked!`,
-        existingBooster.boosterId);
-
-      await Investment.findOneAndUpdate(
-        { investmentId: existingBooster.investment1.investmentId },
-        { boostStatus: 'completed' }
-      );
-
-      await notificationService.send(
-        userId, '🚀 Booster Activated!',
-        `Your booster income of $${existingBooster.unlockAmount.toFixed(2)} has been unlocked! Second investment confirmed.`,
-        'bonus', { unlockAmount: existingBooster.unlockAmount }
-      );
+  for (const inv of activeInvestments) {
+    if (userCache[inv.userId] === undefined) {
+      userCache[inv.userId] = await calculateNodeBooster(inv.userId);
     }
+    const boosterRate = userCache[inv.userId];
+    if (inv.roiPercent !== boosterRate) {
+      inv.roiPercent = boosterRate;
+      await inv.save();
+      updated++;
+    }
+  }
+  return { updated };
+};
+
+/**
+ * Legacy router placeholder for instant booster checks on package purchase
+ */
+const checkAndSetupBooster = async (userId) => {
+  try {
+    await reconcilePowerNodesForUser(userId);
+  } catch (err) {
+    console.error('[BoosterService] Error updating node booster for user:', err.message);
   }
 };
 
-// Expire boosters past 48h
+/**
+ * Legacy cron placeholder
+ */
 const expireOldBoosters = async () => {
-  const now = new Date();
-  const expired = await BoosterIncome.find({ status: 'pending', expiry: { $lt: now } });
-
-  for (const booster of expired) {
-    booster.status = 'expired';
-    await booster.save();
-    await Investment.findOneAndUpdate(
-      { investmentId: booster.investment1?.investmentId },
-      { boostStatus: 'expired' }
-    );
-    await notificationService.send(
-      booster.userId, '⏰ Booster Expired',
-      `Your booster window has expired. Make a second investment to activate the booster next time.`,
-      'system'
-    );
-  }
-
-  return { expired: expired.length };
+  return { expired: 0 };
 };
 
-module.exports = { checkAndSetupBooster, expireOldBoosters };
+module.exports = {
+  calculateNodeBooster,
+  reconcilePowerNodesForUser,
+  reconcilePowerNodes,
+  checkAndSetupBooster,
+  expireOldBoosters
+};

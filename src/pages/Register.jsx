@@ -30,14 +30,13 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
 
     const checkSponsor = async () => {
       try {
-        const users = JSON.parse(localStorage.getItem('aurex_users') || '[]');
-        const sponsor = users.find(u => u.userId.toUpperCase() === formData.sponsorId.toUpperCase());
-        if (sponsor) {
-          setSponsorName(sponsor.name);
+        const res = await api.validateSponsor(formData.sponsorId, isLiveMode);
+        if (res && res.valid) {
+          setSponsorName(res.sponsorName);
           setSponsorError('');
         } else {
           setSponsorName('');
-          setSponsorError('Sponsor not found in structure.');
+          setSponsorError(res?.message || 'Sponsor not found in structure.');
         }
       } catch (err) {
         setSponsorName('');
@@ -50,7 +49,7 @@ export default function Register({ onAuthSuccess, onNavigateToLogin, isLiveMode,
     }, 400);
 
     return () => clearTimeout(delayDebounce);
-  }, [formData.sponsorId]);
+  }, [formData.sponsorId, isLiveMode]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

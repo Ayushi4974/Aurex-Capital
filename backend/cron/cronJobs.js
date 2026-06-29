@@ -10,6 +10,7 @@ const { processAutoCompound } = require('../services/compoundService');
 const { expireOldBoosters, checkAndSetupBooster } = require('../services/boosterService');
 const { distributeWeeklyPool } = require('../services/momentumService');
 const { checkAndUpdate } = require('../services/rankService');
+const { distributeLoyaltyBoosters } = require('../services/loyaltyService');
 const { resetDailyLimits } = require('../services/withdrawService');
 const User = require('../models/User');
 const Session = require('../models/Session');
@@ -132,27 +133,27 @@ cron.schedule('0 9 * * *', async () => {
   } catch (err) { log('REWARD-CHECK', `Error: ${err.message}`); }
 }, { timezone: 'UTC' });
 
+// #11 — Loyalty Booster (10:00 Daily)
+cron.schedule('0 10 * * *', async () => {
+  try {
+    log('LOYALTY-BOOSTER', 'Checking daily loyalty boosters...');
+    const result = await distributeLoyaltyBoosters();
+    log('LOYALTY-BOOSTER', `Done. Credited $${result.totalDistributed?.toFixed(2)} to ${result.creditedCount} users.`);
+  } catch (err) { log('LOYALTY-BOOSTER', `Error: ${err.message}`); }
+}, { timezone: 'UTC' });
+
 // ───────────────────────────────────────────────
 // HOURLY / SUB-HOURLY CRON JOBS
 // ───────────────────────────────────────────────
 
-// #11 — Booster Eligibility Checker (Every 10 mins)
-cron.schedule('*/10 * * * *', async () => {
-  try {
-    // Check for any pending boosters that have been fulfilled
-    const BoosterIncome = require('../models/BoosterIncome');
-    const pendingBoosters = await BoosterIncome.find({ status: 'pending' });
-    log('BOOSTER-CHECK', `Checked ${pendingBoosters.length} pending boosters.`);
-  } catch (err) { log('BOOSTER-CHECK', `Error: ${err.message}`); }
-});
-
-// #12 — Booster Expiry (Hourly)
+// #11 — Power Nodes ROI Booster Updater (Hourly)
 cron.schedule('0 * * * *', async () => {
   try {
-    log('BOOSTER-EXPIRY', 'Expiring old boosters...');
-    const result = await expireOldBoosters();
-    log('BOOSTER-EXPIRY', `Expired ${result.expired} boosters.`);
-  } catch (err) { log('BOOSTER-EXPIRY', `Error: ${err.message}`); }
+    log('POWER-NODES-CHECK', 'Updating Power Nodes ROI booster rates...');
+    const { reconcilePowerNodes } = require('../services/boosterService');
+    const result = await reconcilePowerNodes();
+    log('POWER-NODES-CHECK', `Updated node booster rates for ${result.updated} active investments.`);
+  } catch (err) { log('POWER-NODES-CHECK', `Error: ${err.message}`); }
 });
 
 // #13 — Rank Checker (Hourly)
@@ -196,11 +197,17 @@ cron.schedule('20 * * * *', async () => {
   try {
     const now = new Date();
     const expired = await Investment.find({ status: 'active', expiryDate: { $lt: now, $exists: true } });
+    const { creditWallet } = require('../services/mlmService');
     for (const inv of expired) {
+      const refundAmt = Math.max(0, inv.amount - inv.roiEarned);
+      if (refundAmt > 0) {
+        await creditWallet(inv.userId, 'depositBalance', refundAmt, 'refund',
+          `Refund of remaining principal from expired investment ${inv.investmentId}`);
+      }
       inv.status = 'expired';
       await inv.save();
     }
-    if (expired.length > 0) log('INV-EXPIRY', `Expired ${expired.length} investments past expiry date.`);
+    if (expired.length > 0) log('INV-EXPIRY', `Expired and refunded ${expired.length} investments past expiry date.`);
   } catch (err) { log('INV-EXPIRY', `Error: ${err.message}`); }
 });
 

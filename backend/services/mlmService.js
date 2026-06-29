@@ -304,8 +304,12 @@ const processInvestment = async (userId, investmentId, amount, packageName) => {
   const rankService = require('./rankService');
   for (const { parentId } of ancestors) {
     await rankService.checkAndUpdate(parentId);
+    await rankService.checkVelocityFastTrack(parentId);
   }
-  if (investor) await rankService.checkAndUpdate(userId);
+  if (investor) {
+    await rankService.checkAndUpdate(userId);
+    await rankService.checkVelocityFastTrack(userId);
+  }
 
   return { success: true };
 };

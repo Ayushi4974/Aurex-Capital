@@ -13,19 +13,16 @@ const { creditWallet } = require('./mlmService');
 const notificationService = require('./notificationService');
 
 const RANK_THRESHOLDS = [
-  { rank: 'Scout',         business: 2500,    cashBonus: 50,    rewardType: 'cash' },
-  { rank: 'Ranger',        business: 5000,    cashBonus: 100,   rewardType: 'cash' },
-  { rank: 'Explorer',      business: 10000,   cashBonus: 200,   rewardType: 'gadget' },
-  { rank: 'Navigator',     business: 25000,   cashBonus: 500,   rewardType: 'tour' },
-  { rank: 'Visionary',     business: 50000,   cashBonus: 2500,  rewardType: 'car' },
-  { rank: 'Titan',         business: 100000,  cashBonus: 5000,  rewardType: 'car' },
-  { rank: 'Galaxy',        business: 250000,  cashBonus: 10000, rewardType: 'villa' },
-  { rank: 'Nexus Crown',   business: 500000,  cashBonus: 25000, rewardType: 'villa' },
-  { rank: 'Quantum Legend',business: 1000000, cashBonus: 50000, rewardType: 'villa' },
+  { rank: 'Explorer',      business: 10000,    cashBonus: 100,   rewardType: 'cash',   rewardValueUSD: 100,    rewardDescription: '$100 Cash Bonus' },
+  { rank: 'Navigator',     business: 50000,    cashBonus: 500,   rewardType: 'cash',   rewardValueUSD: 500,    rewardDescription: '$500 Cash Bonus' },
+  { rank: 'Pioneer',       business: 100000,   cashBonus: 0,     rewardType: 'gadget', rewardValueUSD: 1200,   rewardDescription: 'MacBook' },
+  { rank: 'Visionary',     business: 500000,   cashBonus: 0,     rewardType: 'tour',   rewardValueUSD: 5000,   rewardDescription: 'Dubai Trip' },
+  { rank: 'Titan',         business: 1000000,  cashBonus: 0,     rewardType: 'fund',   rewardValueUSD: 25000,  rewardDescription: 'Car Fund' },
+  { rank: 'Galaxy',        business: 5000000,  cashBonus: 0,     rewardType: 'car',    rewardValueUSD: 60000,  rewardDescription: 'Luxury Car' },
+  { rank: 'Nexus Crown',   business: 10000000, cashBonus: 0,     rewardType: 'villa',  rewardValueUSD: 200000, rewardDescription: 'Villa Fund' },
 ];
 
-const RANK_ORDER = ['Member', 'Scout', 'Ranger', 'Explorer', 'Navigator',
-  'Visionary', 'Titan', 'Galaxy', 'Nexus Crown', 'Quantum Legend'];
+const RANK_ORDER = ['Member', 'Explorer', 'Navigator', 'Pioneer', 'Visionary', 'Titan', 'Galaxy', 'Nexus Crown'];
 
 const checkAndUpdate = async (userId) => {
   try {
@@ -51,27 +48,28 @@ const checkAndUpdate = async (userId) => {
           business: totalBusiness, achievedDate: new Date()
         });
 
-        // Credit FastTrack cash bonus
+        // Create pending FastTrack cash bonus
         if (tier.cashBonus > 0) {
-          await creditWallet(userId, 'bonusBalance', tier.cashBonus, 'fasttrack',
-            `FastTrack bonus for achieving ${tier.rank} rank`);
           await FastTrackBonus.create({
             userId, rank: tier.rank, business: totalBusiness,
-            cashBonus: tier.cashBonus, poolShare: 0, status: 'credited'
+            cashBonus: tier.cashBonus, poolShare: 0, status: 'pending'
           });
         }
 
         // Create physical/cash reward record
         await RankReward.create({
           userId, rewardName: `${tier.rank} Achievement Reward`,
-          rewardType: tier.rewardType, rewardValue: tier.cashBonus,
+          rewardType: tier.rewardType, rewardValue: tier.cashBonus || tier.rewardValueUSD || 0,
           status: 'pending'
         });
 
         // Notify user
+        const rewardMsg = tier.cashBonus > 0
+          ? `with $${tier.cashBonus.toFixed(2)} FastTrack bonus!`
+          : `with the ${tier.rewardDescription} reward!`;
         await notificationService.send(
           userId, `🏆 Rank Achieved: ${tier.rank}!`,
-          `Congratulations! You've been promoted to ${tier.rank} with $${tier.cashBonus.toFixed(2)} FastTrack bonus!`,
+          `Congratulations! You've been promoted to ${tier.rank} ${rewardMsg}`,
           'rank', { rank: tier.rank, bonus: tier.cashBonus }
         );
       }
@@ -81,4 +79,44 @@ const checkAndUpdate = async (userId) => {
   }
 };
 
-module.exports = { checkAndUpdate, RANK_THRESHOLDS };
+const checkVelocityFastTrack = async (userId) => {
+  try {
+    const user = await User.findOne({ userId });
+    if (!user) return;
+
+    const tb = await TeamBusiness.findOne({ userId });
+    if (!tb || tb.totalBusiness === 0) return;
+
+    const daysSinceRegistration = (new Date() - user.createdAt) / (1000 * 60 * 60 * 24);
+
+    const milestones = [
+      { key: 'VELOCITY_5000_15', limitDays: 15, requiredBusiness: 5000, reward: 100 },
+      { key: 'VELOCITY_25000_30', limitDays: 30, requiredBusiness: 25000, reward: 500 },
+      { key: 'VELOCITY_100000_60', limitDays: 60, requiredBusiness: 100000, reward: 2000 },
+      { key: 'VELOCITY_500000_90', limitDays: 90, requiredBusiness: 500000, reward: 10000 }
+    ];
+
+    for (const m of milestones) {
+      if (daysSinceRegistration <= m.limitDays && tb.totalBusiness >= m.requiredBusiness) {
+        const alreadyAchieved = await FastTrackBonus.findOne({ userId, rank: m.key });
+        if (!alreadyAchieved) {
+          await FastTrackBonus.create({
+            userId, rank: m.key, business: tb.totalBusiness,
+            cashBonus: m.reward, poolShare: 0, status: 'pending',
+            date: new Date()
+          });
+
+          await notificationService.send(
+            userId, '🚀 Velocity FastTrack Achieved!',
+            `Congratulations! You achieved the $${m.requiredBusiness} business target in ${m.limitDays} days! Your $${m.reward} reward will be processed shortly.`,
+            'bonus', { amount: m.reward }
+          );
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[RankService:FastTrack] Error:', err.message);
+  }
+};
+
+module.exports = { checkAndUpdate, checkVelocityFastTrack, RANK_THRESHOLDS };

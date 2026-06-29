@@ -41,8 +41,23 @@ router.post('/register', authLimiter, [
     if (emailExists) return res.status(400).json({ success: false, message: 'Email already registered' });
 
     const hashedPassword = await bcrypt.hash(password, 12);
+
+    let finalUsername = (username || email.split('@')[0] || '').toLowerCase().trim();
+    let isUnique = false;
+    let attempts = 0;
+    while (!isUnique && attempts < 10) {
+      const checkName = attempts === 0 ? finalUsername : `${finalUsername}${Math.floor(100 + Math.random() * 900)}`;
+      const existing = await User.findOne({ username: checkName });
+      if (!existing) {
+        finalUsername = checkName;
+        isUnique = true;
+      }
+      attempts++;
+    }
+
     const newUser = new User({
       name, email, password: hashedPassword,
+      username: finalUsername,
       mobile: mobile || '', sponsorId: sponsor.userId,
       position: (placement || 'left').toLowerCase(),
       role: 'user', status: 'active'

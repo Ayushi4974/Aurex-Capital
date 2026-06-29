@@ -278,8 +278,6 @@ const runTest = async () => {
     // Ranks are based on team business + user investment
     // Let's verify if userE rank has been promoted.
     // userE's team business is $10,000 (from userF's investment).
-    // Scout needs $2,500.
-    // Ranger needs $5,000.
     // Explorer needs $10,000.
     // Let's check what rank userE has achieved.
     const finalUserE = await User.findOne({ userId: userE.userId });
@@ -289,23 +287,21 @@ const runTest = async () => {
     }
     
     // Verify FastTrack bonus is credited
-    // Scout bonus: $50
-    // Ranger bonus: $100
-    // Explorer bonus: $200
-    // Total FastTrack bonus = 50 + 100 + 200 = $350
+    // Explorer bonus: $100
+    // Total FastTrack bonus = $100
     // Let's check userE's bonus balance or fasttrack reward records.
     const rewards = await RankHistory.find({ userId: userE.userId });
     console.log(`Rank achievements for userE:`, rewards.map(r => r.newRank));
-    if (rewards.length !== 3) {
-      throw new Error(`Expected 3 rank achievements (Scout, Ranger, Explorer) for userE, got: ${rewards.length}`);
+    if (rewards.length !== 1) {
+      throw new Error(`Expected 1 rank achievement (Explorer) for userE, got: ${rewards.length}`);
     }
     
     // Check wallet bonus balance for userE.
-    // Direct bonus ($800) + Level 1 Income ($1000) + FastTrack ($350) = $2150.
+    // Direct bonus ($800) + Level 1 Income ($1000) + FastTrack ($100) = $1900.
     const refreshedWalletE = await Wallet.findOne({ userId: userE.userId });
     console.log(`User E refreshed wallet balance: deposit=${refreshedWalletE.depositBalance}, bonus=${refreshedWalletE.bonusBalance}`);
-    if (refreshedWalletE.bonusBalance !== 2150) {
-      throw new Error(`Expected bonusBalance to be 2150 for userE, got: ${refreshedWalletE.bonusBalance}`);
+    if (refreshedWalletE.bonusBalance !== 1900) {
+      throw new Error(`Expected bonusBalance to be 1900 for userE, got: ${refreshedWalletE.bonusBalance}`);
     }
     console.log('✅ Rank progression and FastTrack bonuses verified successfully!');
 

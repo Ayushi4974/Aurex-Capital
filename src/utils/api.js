@@ -69,6 +69,25 @@ export const api = {
     }
   },
 
+  validateSponsor: async (sponsorId, isLive) => {
+    if (isLive) {
+      try {
+        const res = await client.post('/auth/validate-sponsor', { sponsorId });
+        return res.data;
+      } catch (err) {
+        throw new Error(err.response?.data?.message || 'Sponsor validation failed');
+      }
+    } else {
+      const users = JSON.parse(localStorage.getItem('aurex_users') || '[]');
+      const sponsor = users.find(u => u.userId.toUpperCase() === sponsorId.toUpperCase());
+      if (sponsor) {
+        return { success: true, valid: true, sponsorName: sponsor.name, sponsorId: sponsor.userId };
+      } else {
+        return { success: false, valid: false, message: 'Sponsor ID not found' };
+      }
+    }
+  },
+
   // Profile and Network
   getProfile: async (userId, isLive) => {
     if (isLive) {
