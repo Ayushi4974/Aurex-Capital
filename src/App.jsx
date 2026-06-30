@@ -165,6 +165,28 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Listen for MetaMask account changes reactively
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      const handleAccounts = (accounts) => {
+        if (accounts.length > 0) {
+          const newAddress = accounts[0];
+          localStorage.setItem('aurex_wallet_address', newAddress);
+          setWalletAddress(newAddress);
+        } else {
+          localStorage.removeItem('aurex_wallet_address');
+          setWalletAddress('');
+        }
+      };
+      window.ethereum.on('accountsChanged', handleAccounts);
+      return () => {
+        if (window.ethereum.removeListener) {
+          window.ethereum.removeListener('accountsChanged', handleAccounts);
+        }
+      };
+    }
+  }, []);
+
   // Apply data-theme to <html> element whenever theme changes
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -1005,30 +1027,46 @@ export default function App() {
                         
                         try {
                           if (typeof window !== 'undefined' && window.ethereum) {
+                            // Request MetaMask account access
                             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                             if (accounts && accounts.length > 0) {
                               const realAddress = accounts[0];
                               localStorage.setItem('aurex_wallet_address', realAddress);
                               setWalletAddress(realAddress);
+                              setWalletConnecting(false);
+                              setWalletModalOpen(false);
                               
                               try {
                                 await api.updateProfile({ walletAddress: realAddress }, isLiveMode);
                                 triggerRefresh();
-                              } catch (errDb) {
-                                console.error('Failed to sync wallet address to DB:', errDb);
+                              } catch (err) {
+                                console.error('Failed to sync wallet address to DB:', err);
                               }
                             } else {
-                              alert('No accounts returned from wallet provider.');
+                              throw new Error('No accounts returned from MetaMask.');
                             }
                           } else {
-                            alert(`${w.name} extension not detected. Please install the ${w.name} extension to connect your real wallet.`);
+                            // Mock connection fallback only if no window.ethereum is found
+                            alert(`${w.name} extension not detected. Sandbox mock connection will be used for testing.`);
+                            setTimeout(async () => {
+                              const mockAddress = '0x71C2c253457a48d9489A1Db475De495632aC3A90';
+                              localStorage.setItem('aurex_wallet_address', mockAddress);
+                              setWalletAddress(mockAddress);
+                              setWalletConnecting(false);
+                              setWalletModalOpen(false);
+                              
+                              try {
+                                await api.updateProfile({ walletAddress: mockAddress }, isLiveMode);
+                                triggerRefresh();
+                              } catch (err) {
+                                console.error('Failed to sync wallet address to DB:', err);
+                              }
+                            }, 1000);
                           }
                         } catch (err) {
-                          console.error('Failed to connect real wallet:', err);
-                          alert(err.message || 'Failed to connect real wallet.');
-                        } finally {
+                          console.error('Wallet connection error:', err);
+                          alert(err.message || 'Failed to connect Web3 wallet.');
                           setWalletConnecting(false);
-                          setWalletModalOpen(false);
                         }
                       }}
                       className="btn"
