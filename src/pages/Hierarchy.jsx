@@ -122,7 +122,7 @@ export default function Hierarchy({ user, isLiveMode, onPresetRegister }) {
         <text x={x} y={y + 36} textAnchor="middle" fill="var(--text-white)" fontSize={10} fontWeight={600}
           onClick={() => handleNodeClick(node.userId)}>{node.userId}</text>
         <text x={x} y={y + 47} textAnchor="middle" fill="var(--text-grey)" fontSize={8}
-          onClick={() => handleNodeClick(node.userId)}>{node.name.split(' ')[0]}</text>
+          onClick={() => handleNodeClick(node.userId)}>{(node.name || '').split(' ')[0]}</text>
       </g>
     );
 

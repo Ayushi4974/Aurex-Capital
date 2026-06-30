@@ -214,7 +214,7 @@ export default function BinaryTree({ user, isLiveMode, onNavigate, onPresetRegis
           fontSize={8}
           onClick={() => handleNodeClick(node.userId)}
         >
-          {node.name.split(' ')[0]}
+          {(node.name || '').split(' ')[0]}
         </text>
       </g>
     );
