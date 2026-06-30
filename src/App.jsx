@@ -65,7 +65,7 @@ import logoEmblem from './assets/logo_emblem.png';
 import logoTransparent from './assets/logo_transparent.png';
 
 // Utilities
-import { api, checkBackendHealth } from './utils/api';
+import { api, checkBackendHealth, setCustomApiUrl } from './utils/api';
 import { dbGetVirtualDate, dbAdvanceDate, dbRunDailyROICron, dbRunDailyBinaryCron } from './utils/simDb';
 
 // Floating Canvas Particle Background Component
@@ -477,7 +477,25 @@ export default function App() {
                 const online = await checkBackendHealth();
                 setApiOnline(online);
                 if (!online) {
-                  alert('Connection fail: Live API Server at port 5000 is offline.');
+                  const currentUrl = localStorage.getItem('aurex_custom_api_url') || 'http://localhost:5000/api';
+                  const newUrl = window.prompt(
+                    'Connection fail: Live API Server at port 5000 is offline.\n\n' +
+                    'If you are testing from another device (like mobile phone), ' +
+                    'please enter the custom API Server URL of your host machine (e.g. http://192.168.1.15:5000/api):',
+                    currentUrl
+                  );
+                  if (newUrl) {
+                    setCustomApiUrl(newUrl);
+                    alert('Custom API URL updated. Retrying connection...');
+                    const nowOnline = await checkBackendHealth();
+                    setApiOnline(nowOnline);
+                    if (nowOnline) {
+                      setIsLiveMode(true);
+                      triggerRefresh();
+                    } else {
+                      alert('Failed to connect to custom API: ' + newUrl);
+                    }
+                  }
                   return;
                 }
                 setIsLiveMode(true);

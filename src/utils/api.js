@@ -1,7 +1,21 @@
 import axios from 'axios';
 import * as sim from './simDb';
 
-const API_BASE = 'http://localhost:5000/api';
+const getInitialApiBase = () => {
+  if (typeof window !== 'undefined') {
+    const custom = localStorage.getItem('aurex_custom_api_url');
+    if (custom) return custom;
+    
+    // Automatically match IP address if they are visiting via an IP address (e.g. 192.168.1.XX)
+    const host = window.location.hostname;
+    if (host && host !== 'localhost' && host !== '127.0.0.1' && !host.endsWith('.vercel.app')) {
+      return `http://${host}:5000/api`;
+    }
+  }
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE = getInitialApiBase();
 
 const client = axios.create({
   baseURL: API_BASE,
@@ -19,12 +33,20 @@ client.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+export const setCustomApiUrl = (url) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('aurex_custom_api_url', url);
+  }
+  client.defaults.baseURL = url;
+};
+
 // Checks if the live backend is accessible
 export const checkBackendHealth = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/auth/health-check-dummy-fail-safe`).catch(() => null);
-    // Since there might not be a health-check endpoint, let's just query root
-    const rootRes = await axios.get('http://localhost:5000/').catch(() => null);
+    const currentBase = client.defaults.baseURL || API_BASE;
+    const rootUrl = currentBase.replace('/api', '') || 'http://localhost:5000';
+    
+    const rootRes = await axios.get(rootUrl, { timeout: 3000 }).catch(() => null);
     return rootRes && rootRes.status === 200;
   } catch (err) {
     return false;
