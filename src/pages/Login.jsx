@@ -28,7 +28,14 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
         onAuthSuccess(user);
       }, 1000);
     } catch (err) {
-      setError(err.message || 'Login failed. Verify credentials.');
+      if (err.message && (err.message.toLowerCase().includes('network') || err.message.toLowerCase().includes('failed') || err.message.toLowerCase().includes('cors'))) {
+        setError(
+          'Connection fail: Cannot reach API server. ' +
+          'If you are testing from another device, click "Configure Custom API Endpoint" at the bottom of the card and enter your PC\'s Wi-Fi LAN IP (e.g. http://192.168.1.XX:5000/api).'
+        );
+      } else {
+        setError(err.message || 'Login failed. Verify credentials.');
+      }
     } finally {
       setLoading(false);
     }
