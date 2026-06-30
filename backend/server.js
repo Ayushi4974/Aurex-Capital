@@ -117,6 +117,12 @@ const startServer = async () => {
   });
 };
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+} else {
+  // Connect to DB immediately on Vercel without listening on a port
+  mongoConnect();
+}
 
-module.exports = { app, server, io };
+// Vercel node runtime expects the express app to be exported directly
+module.exports = app;
