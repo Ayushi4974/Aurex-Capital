@@ -22,7 +22,7 @@ router.get('/profile', verifyToken, async (req, res, next) => {
 router.put('/profile', verifyToken, async (req, res, next) => {
   try {
     const { fullName, mobile, country, state, city, address, walletAddress, bankDetails } = req.body;
-    if (walletAddress) await User.findOneAndUpdate({ userId: req.user.userId }, { walletAddress });
+    if (walletAddress !== undefined) await User.findOneAndUpdate({ userId: req.user.userId }, { walletAddress });
     if (mobile) await User.findOneAndUpdate({ userId: req.user.userId }, { mobile });
     const profile = await UserProfile.findOneAndUpdate(
       { userId: req.user.userId },
