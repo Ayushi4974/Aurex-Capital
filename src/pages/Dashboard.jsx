@@ -474,7 +474,7 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="date" stroke="var(--text-grey)" fontSize={10} />
               <YAxis stroke="var(--text-grey)" fontSize={10} />
-              <Tooltip contentStyle={{ background: '#0e0e0e', border: '1px solid var(--border-gold)', borderRadius: '6px' }} />
+              <Tooltip contentStyle={{ background: '#0e0e0e', border: '1px solid var(--border-gold)', borderRadius: '6px' }} cursor={{ fill: 'rgba(212, 175, 55, 0.05)' }} />
               <Bar dataKey="Commissions" fill="url(#colorBarComm)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1300} animationBegin={150} />
             </BarChart>
           </ResponsiveContainer>
