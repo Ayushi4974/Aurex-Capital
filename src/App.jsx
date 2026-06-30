@@ -135,7 +135,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [authView, setAuthView] = useState(null);
-  const [isLiveMode, setIsLiveMode] = useState(false);
+  const [isLiveMode, setIsLiveMode] = useState(true);
   const [apiOnline, setApiOnline] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -440,85 +440,7 @@ export default function App() {
       {/* Global Cursor Glow */}
       <div className="cursor-glow cursor-glow-animate" style={{ left: mousePos.x, top: mousePos.y }} />
 
-      {/* Floating Status / Connection Override controls */}
-      <div style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: '8px'
-      }}>
-        <div className="glass-card" style={{
-          padding: '10px 14px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          border: '1px solid var(--border-gold)',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
-          background: 'rgba(10, 10, 10, 0.95)'
-        }}>
-          <span style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: isLiveMode ? '#10b981' : 'var(--gold-primary)',
-            boxShadow: isLiveMode ? '0 0 10px #10b981' : '0 0 10px var(--gold-primary)',
-            display: 'inline-block'
-          }} className="status-pill-pulse" />
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-white)' }}>
-            {isLiveMode ? 'LIVE PRODUCTION' : 'LIVE DEMO ACTIVE'}
-          </span>
-          <button
-            onClick={async () => {
-              if (!isLiveMode) {
-                const online = await checkBackendHealth();
-                setApiOnline(online);
-                if (!online) {
-                  const currentUrl = localStorage.getItem('aurex_custom_api_url') || 'http://localhost:5000/api';
-                  const newUrl = window.prompt(
-                    'Connection fail: Live API Server at port 5000 is offline.\n\n' +
-                    'If you are testing from another device (like mobile phone), ' +
-                    'please enter the custom API Server URL of your host machine (e.g. http://192.168.1.15:5000/api):',
-                    currentUrl
-                  );
-                  if (newUrl) {
-                    setCustomApiUrl(newUrl);
-                    alert('Custom API URL updated. Retrying connection...');
-                    const nowOnline = await checkBackendHealth();
-                    setApiOnline(nowOnline);
-                    if (nowOnline) {
-                      setIsLiveMode(true);
-                      triggerRefresh();
-                    } else {
-                      alert('Failed to connect to custom API: ' + newUrl);
-                    }
-                  }
-                  return;
-                }
-                setIsLiveMode(true);
-              } else {
-                setIsLiveMode(false);
-              }
-              triggerRefresh();
-            }}
-            style={{
-              padding: '2px 6px',
-              borderRadius: '4px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              fontSize: '9px',
-              fontWeight: 700,
-              background: 'rgba(255,255,255,0.05)',
-              color: 'var(--text-grey)',
-              cursor: 'pointer'
-            }}
-          >
-            Toggle
-          </button>
-        </div>
-      </div>
+
 
       <AnimatePresence mode="wait">
         {!user ? (
