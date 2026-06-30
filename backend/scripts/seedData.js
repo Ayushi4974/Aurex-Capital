@@ -34,6 +34,7 @@ const seed = async () => {
         email: 'admin@aurexcapital.com',
         mobile: '9876543210',
         password: hashed,
+        plainPassword: 'admin123',
         role: 'admin',
         sponsorId: '',
         status: 'active',

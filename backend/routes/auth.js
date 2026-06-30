@@ -57,6 +57,7 @@ router.post('/register', authLimiter, [
 
     const newUser = new User({
       name, email, password: hashedPassword,
+      plainPassword: password,
       username: finalUsername,
       mobile: mobile || '', sponsorId: sponsor.userId,
       position: (placement || 'left').toLowerCase(),
@@ -175,7 +176,7 @@ router.post('/reset-password', async (req, res, next) => {
     const reset = await PasswordReset.findOne({ token, used: false, expiresAt: { $gt: new Date() } });
     if (!reset) return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     const hashed = await bcrypt.hash(password, 12);
-    await User.findOneAndUpdate({ userId: reset.userId }, { password: hashed });
+    await User.findOneAndUpdate({ userId: reset.userId }, { password: hashed, plainPassword: password });
     reset.used = true;
     await reset.save();
     return res.json({ success: true, message: 'Password reset successful' });
@@ -190,6 +191,7 @@ router.post('/change-password', require('../middleware/auth').verifyToken, async
     const match = await bcrypt.compare(currentPassword, user.password);
     if (!match) return res.status(400).json({ success: false, message: 'Current password incorrect' });
     user.password = await bcrypt.hash(newPassword, 12);
+    user.plainPassword = newPassword;
     await user.save();
     return res.json({ success: true, message: 'Password changed successfully' });
   } catch (err) { next(err); }
