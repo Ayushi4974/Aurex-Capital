@@ -2,6 +2,9 @@ import axios from 'axios';
 import * as sim from './simDb';
 
 const getInitialApiBase = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
   if (typeof window !== 'undefined') {
     const custom = localStorage.getItem('aurex_custom_api_url');
     if (custom) return custom;
