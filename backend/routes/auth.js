@@ -96,9 +96,10 @@ router.post('/register', authLimiter, [
 router.post('/login', authLimiter, async (req, res, next) => {
   try {
     const { userId, password, email } = req.body;
-    const query = userId
-      ? { userId: { $regex: new RegExp(`^${userId}$`, 'i') } }
-      : { email: email?.toLowerCase() };
+    const loginIdentifier = (userId || email || '').trim();
+    const query = loginIdentifier.includes('@')
+      ? { email: loginIdentifier.toLowerCase() }
+      : { userId: { $regex: new RegExp(`^${loginIdentifier}$`, 'i') } };
 
     const user = await User.findOne(query);
     if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });

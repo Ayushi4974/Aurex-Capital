@@ -36,10 +36,7 @@ export const api = {
   login: async (userId, password, isLive) => {
     if (isLive) {
       try {
-        const payload = userId.includes('@') 
-          ? { email: userId, password } 
-          : { userId, password };
-        const res = await client.post('/auth/login', payload);
+        const res = await client.post('/auth/login', { userId, password });
         localStorage.setItem('aurex_token', res.data.token);
         localStorage.setItem('aurex_logged_user_id', res.data.user.userId);
         return res.data.user;
