@@ -143,6 +143,10 @@ export default function App() {
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
   const [theme, setTheme] = useState(() => localStorage.getItem('aurex_theme') || 'dark');
 
+  useEffect(() => {
+    localStorage.removeItem('aurex_custom_api_url');
+  }, []);
+
   // Preset state for downline registration from binary hierarchy tree
   const [presetRegData, setPresetRegData] = useState(null);
 

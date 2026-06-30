@@ -28,14 +28,7 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
         onAuthSuccess(user);
       }, 1000);
     } catch (err) {
-      if (err.message && (err.message.toLowerCase().includes('network') || err.message.toLowerCase().includes('failed') || err.message.toLowerCase().includes('cors'))) {
-        setError(
-          'Connection fail: Cannot reach API server. ' +
-          'If you are testing from another device, click "Configure Custom API Endpoint" at the bottom of the card and enter your PC\'s Wi-Fi LAN IP (e.g. http://192.168.1.XX:5000/api).'
-        );
-      } else {
-        setError(err.message || 'Login failed. Verify credentials.');
-      }
+      setError(err.message || 'Login failed. Verify credentials.');
     } finally {
       setLoading(false);
     }
@@ -68,7 +61,7 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
             type="password" 
             name="password" 
             required 
-            placeholder="••••••••" 
+            placeholder="••••••" 
             value={formData.password}
             onChange={handleChange}
             className="form-input custom-auth-input" 
@@ -77,16 +70,27 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
         </div>
       </div>
  
-      <motion.button 
-        whileHover={{ scale: 1.015 }}
-        whileTap={{ scale: 0.985 }}
+      <button 
         type="submit" 
-        disabled={loading} 
-        className="btn custom-auth-btn" 
-        style={{ width: '100%', padding: '14px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', height: '48px', marginTop: '10px', cursor: 'pointer' }}
+        disabled={loading}
+        className="btn auth-submit-btn"
+        style={{
+          width: '100%',
+          height: '48px',
+          borderRadius: '12px',
+          background: 'var(--gold-primary)',
+          color: 'black',
+          fontWeight: 700,
+          border: 'none',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          marginTop: '8px',
+          fontSize: '14px',
+          boxShadow: '0 4px 15px rgba(212, 175, 55, 0.2)',
+          transition: 'all 0.3s ease'
+        }}
       >
-        {loading ? 'Authenticating...' : 'Sign In to Account'}
-      </motion.button>
+        {loading ? 'Signing In...' : 'Sign In to Account'}
+      </button>
     </form>
   );
  
@@ -116,23 +120,10 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
     );
   }
  
-  // Standalone page layout fallback
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'radial-gradient(circle at center, #1c1505 0%, #050505 100%)',
-      padding: '24px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(170, 124, 17, 0.06) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
- 
+    <div className="auth-container">
       <motion.div 
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         style={{ width: '100%', maxWidth: '440px', zIndex: 10 }}
@@ -173,26 +164,6 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
             Don't have an account yet?{' '}
             <button onClick={onNavigateToRegister} style={{ background: 'transparent', border: 'none', color: 'var(--gold-primary)', fontWeight: 600, cursor: 'pointer' }}>
               Register Account
-            </button>
-          </div>
-          <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '11px' }}>
-            <button 
-              onClick={async () => {
-                const currentUrl = localStorage.getItem('aurex_custom_api_url') || 'http://localhost:5000/api';
-                const newUrl = window.prompt(
-                  'Set Custom Backend API Server URL:\n\n' +
-                  'If you are hosting the backend locally or using ngrok, enter the HTTPS/HTTP URL here (e.g. https://xxx.ngrok.app/api or http://192.168.1.XX:5000/api):',
-                  currentUrl
-                );
-                if (newUrl !== null) {
-                  setCustomApiUrl(newUrl);
-                  alert('API URL updated successfully! Refreshing...');
-                  window.location.reload();
-                }
-              }}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', textDecoration: 'underline', cursor: 'pointer' }}
-            >
-              Configure Custom API Endpoint
             </button>
           </div>
         </div>
