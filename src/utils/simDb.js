@@ -502,7 +502,10 @@ export const getFTPSlab = (amount) => {
 // Auth methods
 export const dbLogin = (userId, password) => {
   const db = loadDb();
-  const user = db.users.find(u => u.userId.toUpperCase() === userId.toUpperCase());
+  const user = db.users.find(u => 
+    u.userId.toUpperCase() === userId.toUpperCase() ||
+    u.email.toLowerCase() === userId.toLowerCase()
+  );
   if (!user) throw new Error('User not found');
   if (user.password !== password) throw new Error('Invalid credentials');
   return user;
