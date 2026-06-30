@@ -9,9 +9,13 @@ const getInitialApiBase = () => {
     const custom = localStorage.getItem('aurex_custom_api_url');
     if (custom) return custom;
     
-    // Automatically match IP address if they are visiting via an IP address (e.g. 192.168.1.XX)
     const host = window.location.hostname;
-    if (host && host !== 'localhost' && host !== '127.0.0.1' && !host.endsWith('.vercel.app')) {
+    if (host && host !== 'localhost' && host !== '127.0.0.1') {
+      // If it is a domain name (like Vercel), route relatively to the same host's /api folder!
+      if (host.endsWith('.vercel.app') || !/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+        return '/api';
+      }
+      // If visiting via local LAN IP, connect to the local backend port 5000
       return `http://${host}:5000/api`;
     }
   }
