@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, AlertCircle, CheckCircle } from 'lucide-react';
-import { api } from '../utils/api';
+import { api, setCustomApiUrl } from '../utils/api';
 import logoEmblem from '../assets/logo_emblem.png';
 
 export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode, isModal = true, onBackToHome }) {
@@ -166,6 +166,26 @@ export default function Login({ onAuthSuccess, onNavigateToRegister, isLiveMode,
             Don't have an account yet?{' '}
             <button onClick={onNavigateToRegister} style={{ background: 'transparent', border: 'none', color: 'var(--gold-primary)', fontWeight: 600, cursor: 'pointer' }}>
               Register Account
+            </button>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '11px' }}>
+            <button 
+              onClick={async () => {
+                const currentUrl = localStorage.getItem('aurex_custom_api_url') || 'http://localhost:5000/api';
+                const newUrl = window.prompt(
+                  'Set Custom Backend API Server URL:\n\n' +
+                  'If you are hosting the backend locally or using ngrok, enter the HTTPS/HTTP URL here (e.g. https://xxx.ngrok.app/api or http://192.168.1.XX:5000/api):',
+                  currentUrl
+                );
+                if (newUrl !== null) {
+                  setCustomApiUrl(newUrl);
+                  alert('API URL updated successfully! Refreshing...');
+                  window.location.reload();
+                }
+              }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', textDecoration: 'underline', cursor: 'pointer' }}
+            >
+              Configure Custom API Endpoint
             </button>
           </div>
         </div>
