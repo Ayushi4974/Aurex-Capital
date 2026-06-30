@@ -87,8 +87,15 @@ const debitWallet = async (userId, bucket, amount, type, remark, referenceId = '
 // ─────────────────────────────────────────────
 const findPlacementNode = async (sponsorId, preferredPosition) => {
   const queue = [{ nodeId: sponsorId, position: preferredPosition }];
+  const visited = new Set();
   while (queue.length > 0) {
     const { nodeId, position } = queue.shift();
+    if (visited.has(nodeId)) {
+      console.warn(`[MLM Engine] Cycle detected in findPlacementNode at ${nodeId}. Aborting traversal.`);
+      break;
+    }
+    visited.add(nodeId);
+
     const node = await BinaryTree.findOne({ userId: nodeId });
     if (!node) continue;
 
@@ -169,17 +176,26 @@ const processRegistration = async (newUser) => {
       { $inc: { directCount: 1 } },
       { new: true }
     );
-    const newDirectCount = sponsor.directCount;
-    const newMaxLevel = sponsor.role === 'admin' ? 30 : getUnlockedLevels(newDirectCount);
-    await LevelUnlock.findOneAndUpdate(
-      { userId: sponsorId },
-      { directCount: newDirectCount, levelsUnlocked: newMaxLevel, maxLevel: newMaxLevel }
-    );
+    if (sponsor) {
+      const newDirectCount = sponsor.directCount;
+      const newMaxLevel = sponsor.role === 'admin' ? 30 : getUnlockedLevels(newDirectCount);
+      await LevelUnlock.findOneAndUpdate(
+        { userId: sponsorId },
+        { directCount: newDirectCount, levelsUnlocked: newMaxLevel, maxLevel: newMaxLevel }
+      );
+    }
   }
 
   // Increment teamCount for all binary ancestors
   let ancestorId = parentId;
+  const visitedAncestors = new Set();
   while (ancestorId) {
+    if (visitedAncestors.has(ancestorId)) {
+      console.warn(`[MLM Engine] Cycle detected in registration ancestor chain traversal at ${ancestorId}. Aborting.`);
+      break;
+    }
+    visitedAncestors.add(ancestorId);
+
     await User.findOneAndUpdate({ userId: ancestorId }, { $inc: { teamCount: 1 } });
     const ancestorNode = await BinaryTree.findOne({ userId: ancestorId });
     ancestorId = ancestorNode ? ancestorNode.parentId : null;
@@ -195,8 +211,15 @@ const processRegistration = async (newUser) => {
 const getSponsorChain = async (startUserId, maxLevels = 30) => {
   const chain = [];
   let current = await User.findOne({ userId: startUserId });
+  const visited = new Set();
   for (let level = 1; level <= maxLevels; level++) {
     if (!current || !current.sponsorId) break;
+    if (visited.has(current.sponsorId)) {
+      console.warn(`[MLM Engine] Cycle detected in sponsor chain at ${current.sponsorId}. Aborting sponsor chain.`);
+      break;
+    }
+    visited.add(current.sponsorId);
+
     const sponsor = await User.findOne({ userId: current.sponsorId });
     if (!sponsor) break;
     chain.push({ user: sponsor, level });
@@ -211,7 +234,14 @@ const getSponsorChain = async (startUserId, maxLevels = 30) => {
 const getBinaryAncestors = async (userId) => {
   const ancestors = [];
   let nodeId = userId;
+  const visited = new Set();
   while (true) {
+    if (visited.has(nodeId)) {
+      console.warn(`[MLM Engine] Cycle detected in getBinaryAncestors at ${nodeId}. Aborting ancestor traversal.`);
+      break;
+    }
+    visited.add(nodeId);
+
     const node = await BinaryTree.findOne({ userId: nodeId });
     if (!node || !node.parentId) break;
     ancestors.push({ parentId: node.parentId, childPosition: node.position });

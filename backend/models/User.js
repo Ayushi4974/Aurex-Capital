@@ -34,8 +34,17 @@ const userSchema = new mongoose.Schema({
 // Auto-generate userId before save
 userSchema.pre('save', async function (next) {
   if (!this.userId) {
-    const count = await mongoose.model('User').countDocuments();
-    this.userId = `AC${100001 + count}`;
+    const highestUser = await mongoose.model('User')
+      .findOne({ userId: /^AC\d+$/ })
+      .sort({ userId: -1 });
+    let newNumber = 100001;
+    if (highestUser && highestUser.userId) {
+      const match = highestUser.userId.match(/^AC(\d+)$/);
+      if (match) {
+        newNumber = parseInt(match[1], 10) + 1;
+      }
+    }
+    this.userId = `AC${newNumber}`;
   }
   next();
 });

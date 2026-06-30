@@ -32,6 +32,33 @@ const runTest = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ Connected.');
 
+    // Ensure Admin User (AC100001) exists
+    const adminUser = await User.findOne({ userId: 'AC100001' });
+    if (!adminUser) {
+      console.log('ℹ️ Admin user AC100001 not found. Creating for test...');
+      const hashed = await bcrypt.hash('admin123', 12);
+      const admin = new User({
+        userId: 'AC100001',
+        name: 'Aurex Capital Admin',
+        email: 'admin@aurexcapital.com',
+        mobile: '9876543210',
+        password: hashed,
+        role: 'admin',
+        sponsorId: '',
+        status: 'active',
+        rank: 'Quantum Legend',
+        directCount: 0,
+        teamCount: 0
+      });
+      await admin.save();
+      await UserProfile.create({ userId: 'AC100001', fullName: 'Aurex Capital Admin' });
+      await Wallet.create({ userId: 'AC100001', depositBalance: 100000, earningBalance: 25000, bonusBalance: 0 });
+      await BinaryTree.create({ userId: 'AC100001', parentId: '', position: '', depth: 0, path: '/AC100001' });
+      await TeamBusiness.create({ userId: 'AC100001' });
+      await LevelUnlock.create({ userId: 'AC100001', directCount: 0, levelsUnlocked: 30, maxLevel: 30 });
+      console.log('✅ Admin user AC100001 created.');
+    }
+
     // 1. Clean up old test data (emails matching test_mlm_*)
     console.log('🧹 Cleaning up prior test data...');
     const oldUsers = await User.find({ email: /test_mlm_/ });
@@ -49,6 +76,8 @@ const runTest = async () => {
       await DirectBonus.deleteMany({ fromUser: { $in: oldUserIds } });
       await LevelIncome.deleteMany({ fromUser: { $in: oldUserIds } });
       await RankHistory.deleteMany({ userId: { $in: oldUserIds } });
+      await require('../models/FastTrackBonus').deleteMany({ userId: { $in: oldUserIds } });
+      await require('../models/RankReward').deleteMany({ userId: { $in: oldUserIds } });
       console.log(`🧹 Deleted ${oldUserIds.length} prior test users and related records.`);
     }
 
@@ -296,12 +325,23 @@ const runTest = async () => {
       throw new Error(`Expected 1 rank achievement (Explorer) for userE, got: ${rewards.length}`);
     }
     
+    // Manually process pending FastTrack bonuses for the test since cron isn't running
+    const FastTrackBonus = require('../models/FastTrackBonus');
+    const { creditWallet } = require('../services/mlmService');
+    const pendingFT = await FastTrackBonus.find({ userId: userE.userId, status: 'pending' });
+    for (const ft of pendingFT) {
+      await creditWallet(ft.userId, 'bonusBalance', ft.cashBonus, 'fasttrack',
+        `FastTrack bonus for ${ft.rank}`, ft.bonusId);
+      ft.status = 'credited';
+      await ft.save();
+    }
+
     // Check wallet bonus balance for userE.
-    // Direct bonus ($800) + Level 1 Income ($1000) + FastTrack ($100) = $1900.
+    // Direct bonus ($800) + Level 1 Income ($1000) + Explorer FastTrack ($100) + Velocity FastTrack ($100) = $2000.
     const refreshedWalletE = await Wallet.findOne({ userId: userE.userId });
     console.log(`User E refreshed wallet balance: deposit=${refreshedWalletE.depositBalance}, bonus=${refreshedWalletE.bonusBalance}`);
-    if (refreshedWalletE.bonusBalance !== 1900) {
-      throw new Error(`Expected bonusBalance to be 1900 for userE, got: ${refreshedWalletE.bonusBalance}`);
+    if (refreshedWalletE.bonusBalance !== 2000) {
+      throw new Error(`Expected bonusBalance to be 2000 for userE, got: ${refreshedWalletE.bonusBalance}`);
     }
     console.log('✅ Rank progression and FastTrack bonuses verified successfully!');
 
