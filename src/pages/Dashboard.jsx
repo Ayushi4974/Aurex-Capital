@@ -441,15 +441,15 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
             <AreaChart data={roiChartData}>
               <defs>
                 <linearGradient id="colorRoi" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ec4899" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#d4af37" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="date" stroke="var(--text-grey)" fontSize={10} />
               <YAxis stroke="var(--text-grey)" fontSize={10} />
               <Tooltip contentStyle={{ background: '#0e0e0e', border: '1px solid var(--border-gold)', borderRadius: '6px' }} />
-              <Area type="monotone" dataKey="Cumulative" stroke="#ec4899" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRoi)" isAnimationActive={true} animationDuration={1300} />
+              <Area type="monotone" dataKey="Cumulative" stroke="#d4af37" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRoi)" isAnimationActive={true} animationDuration={1300} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
@@ -467,8 +467,8 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
             <BarChart data={earningsChartData}>
               <defs>
                 <linearGradient id="colorBarComm" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#a855f7" stopOpacity={0.2}/>
+                  <stop offset="5%" stopColor="#d4af37" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#aa7c11" stopOpacity={0.2}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -495,7 +495,7 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
               <XAxis dataKey="date" stroke="var(--text-grey)" fontSize={10} />
               <YAxis stroke="var(--text-grey)" fontSize={10} />
               <Tooltip contentStyle={{ background: '#0e0e0e', border: '1px solid var(--border-gold)', borderRadius: '6px' }} />
-              <Line type="monotone" dataKey="Staked" stroke="#34d399" strokeWidth={3} dot={{ fill: '#34d399', r: 4 }} isAnimationActive={true} animationDuration={1300} />
+              <Line type="monotone" dataKey="Staked" stroke="#d4af37" strokeWidth={3} dot={{ fill: '#f3e5ab', r: 4 }} isAnimationActive={true} animationDuration={1300} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>

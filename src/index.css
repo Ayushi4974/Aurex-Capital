@@ -262,7 +262,7 @@ button, .btn {
   border: 1px solid var(--border-grey);
 }
 [data-theme="dark"] .shifting-card {
-  background: linear-gradient(-45deg, rgba(24, 24, 24, 0.9), rgba(30, 26, 12, 0.9), rgba(16, 24, 30, 0.9), rgba(24, 24, 24, 0.9));
+  background: linear-gradient(-45deg, rgba(13, 13, 13, 0.95), rgba(35, 29, 13, 0.95), rgba(22, 22, 22, 0.95), rgba(13, 13, 13, 0.95));
   background-size: 300% 300%;
 }
 .shifting-card:hover {
