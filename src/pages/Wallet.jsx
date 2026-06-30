@@ -173,6 +173,8 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
     } finally {
       setTransferLoading(false);
     }
+  };
+
   const handleWeb3Deposit = async (e) => {
     e.preventDefault();
     const amt = parseFloat(web3DepositAmount);
