@@ -100,6 +100,28 @@ export const api = {
     }
   },
 
+  updateProfile: async (data, isLive) => {
+    if (isLive) {
+      try {
+        const res = await client.put('/user/profile', data);
+        return res.data;
+      } catch (err) {
+        throw new Error(err.response?.data?.message || 'Profile update failed');
+      }
+    } else {
+      const users = JSON.parse(localStorage.getItem('aurex_users') || '[]');
+      const loggedId = localStorage.getItem('aurex_logged_user_id');
+      const idx = users.findIndex(u => u.userId === loggedId);
+      if (idx !== -1) {
+        if (data.walletAddress !== undefined) {
+          users[idx].walletAddress = data.walletAddress;
+        }
+        localStorage.setItem('aurex_users', JSON.stringify(users));
+      }
+      return { success: true };
+    }
+  },
+
   getDirectTeam: async (userId, isLive) => {
     if (isLive) {
       const res = await client.get('/user/direct-team');

@@ -146,6 +146,12 @@ export default function App() {
   // Preset state for downline registration from binary hierarchy tree
   const [presetRegData, setPresetRegData] = useState(null);
 
+  // Web3 Wallet states
+  const [walletAddress, setWalletAddress] = useState(() => localStorage.getItem('aurex_wallet_address') || '');
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const [walletConnecting, setWalletConnecting] = useState(false);
+  const [connectingWalletType, setConnectingWalletType] = useState('');
+
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -228,6 +234,10 @@ export default function App() {
         const profile = await api.getProfile(user.userId, isLiveMode);
         if (profile) {
           setUser(profile);
+          if (profile.walletAddress) {
+            setWalletAddress(profile.walletAddress);
+            localStorage.setItem('aurex_wallet_address', profile.walletAddress);
+          }
         }
       } catch (err) {
         console.error('Failed to sync profile status:', err);
@@ -244,8 +254,10 @@ export default function App() {
 
   const handleLogout = () => {
     setUser(null);
+    setWalletAddress('');
     localStorage.removeItem('aurex_token');
     localStorage.removeItem('aurex_logged_user_id');
+    localStorage.removeItem('aurex_wallet_address');
   };
 
   const handlePresetRegister = (presetData) => {
@@ -696,6 +708,89 @@ export default function App() {
             {/* Main Content Body */}
             <main style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column', background: theme === 'light' ? 'var(--bg-main)' : 'radial-gradient(circle at top right, #0e0a02 0%, #050505 60%)', overflowY: 'auto', transition: 'background 0.3s ease' }}>
               
+              {/* Desktop Top Header */}
+              {!isMobile && (
+                <header style={{
+                  height: '70px',
+                  background: 'rgba(10, 10, 10, 0.30)',
+                  backdropFilter: 'blur(12px)',
+                  borderBottom: '1px solid var(--border-grey)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0 30px',
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 800
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                      CONSENSUS NODE STATUS: <span style={{ color: '#2dd4bf', textShadow: '0 0 10px rgba(45,212,191,0.4)' }}>ACTIVE</span>
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    {walletAddress ? (
+                      <div 
+                        style={{
+                          padding: '8px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid #10b981',
+                          background: 'rgba(16, 185, 129, 0.03)',
+                          color: '#10b981',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          if (window.confirm('Do you want to disconnect your Web3 wallet?')) {
+                            localStorage.removeItem('aurex_wallet_address');
+                            setWalletAddress('');
+                            api.updateProfile({ walletAddress: '' }, isLiveMode).catch(console.error);
+                            triggerRefresh();
+                          }
+                        }}
+                      >
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: '#10b981',
+                          boxShadow: '0 0 8px #10b981',
+                          display: 'inline-block'
+                        }} className="status-pill-pulse" />
+                        <span>{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setWalletModalOpen(true)}
+                        style={{
+                          padding: '8px 16px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--gold-primary)',
+                          background: 'linear-gradient(135deg, #181818, #0a0a0a)',
+                          color: 'var(--gold-primary)',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: '0 0 10px rgba(212,175,55,0.05)',
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
+                        <Wallet size={13} />
+                        Connect Wallet
+                      </button>
+                    )}
+                  </div>
+                </header>
+              )}
+
               {/* Mobile Top Header */}
               {isMobile && (
                 <header style={{
@@ -723,7 +818,31 @@ export default function App() {
                       <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '16px', color: 'var(--gold-primary)' }}>Aurex</span>
                     </div>
                   </div>
-                  <span style={{ fontSize: '11px', color: 'var(--text-grey)', fontWeight: 600 }}>{user.userId}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {walletAddress ? (
+                      <span 
+                        onClick={() => {
+                          if (window.confirm('Do you want to disconnect your Web3 wallet?')) {
+                            localStorage.removeItem('aurex_wallet_address');
+                            setWalletAddress('');
+                            api.updateProfile({ walletAddress: '' }, isLiveMode).catch(console.error);
+                            triggerRefresh();
+                          }
+                        }}
+                        style={{ fontSize: '10px', color: '#10b981', fontWeight: 700, border: '1px solid #10b981', padding: '4px 8px', borderRadius: '6px', background: 'rgba(16,185,129,0.03)' }}
+                      >
+                        {walletAddress.slice(0, 4)}...{walletAddress.slice(-3)}
+                      </span>
+                    ) : (
+                      <button 
+                        onClick={() => setWalletModalOpen(true)}
+                        style={{ background: 'transparent', border: '1px solid var(--gold-primary)', color: 'var(--gold-primary)', fontSize: '10px', fontWeight: 700, padding: '4px 8px', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        Connect
+                      </button>
+                    )}
+                    <span style={{ fontSize: '11px', color: 'var(--text-grey)', fontWeight: 600 }}>{user.userId}</span>
+                  </div>
                 </header>
               )}
               
@@ -782,6 +901,151 @@ export default function App() {
               </footer>
             </main>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Web3 Wallet Connect Modal */}
+      <AnimatePresence>
+        {walletModalOpen && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}>
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="glass-card"
+              style={{
+                width: '100%',
+                maxWidth: '420px',
+                padding: '28px',
+                border: '1px solid var(--border-gold)',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.8), 0 0 25px var(--gold-glow)',
+                position: 'relative'
+              }}
+            >
+              <button
+                onClick={() => setWalletModalOpen(false)}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-grey)',
+                  fontSize: '18px',
+                  cursor: 'pointer'
+                }}
+              >
+                &times;
+              </button>
+
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <div style={{
+                  width: '54px',
+                  height: '54px',
+                  borderRadius: '16px',
+                  border: '1px solid var(--gold-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 12px',
+                  background: 'rgba(212, 175, 55, 0.05)',
+                  boxShadow: '0 0 15px var(--gold-glow)'
+                }}>
+                  <Wallet size={24} style={{ color: 'var(--gold-primary)' }} />
+                </div>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 800 }} className="gold-text-gradient">
+                  CONNECT WEB3 WALLET
+                </h3>
+                <p style={{ color: 'var(--text-grey)', fontSize: '12px', marginTop: '4px' }}>
+                  Select your wallet provider to sync staking contracts
+                </p>
+              </div>
+
+              {walletConnecting ? (
+                <div style={{ textAlign: 'center', padding: '30px 0' }}>
+                  <div className="spinner-glow" style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '3px solid rgba(212, 175, 55, 0.1)',
+                    borderTop: '3px solid var(--gold-primary)',
+                    borderRadius: '50%',
+                    margin: '0 auto 16px',
+                    animation: 'spin 1s linear infinite'
+                  }} />
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-white)' }}>
+                    Connecting to {connectingWalletType}...
+                  </p>
+                  <p style={{ fontSize: '11px', color: 'var(--text-grey)', marginTop: '4px' }}>
+                    Please approve connection request in your extension
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {[
+                    { name: 'MetaMask', icon: '🦊' },
+                    { name: 'Trust Wallet', icon: '🛡️' },
+                    { name: 'Coinbase Wallet', icon: '🔵' },
+                    { name: 'WalletConnect', icon: '🌐' }
+                  ].map(w => (
+                    <button
+                      key={w.name}
+                      onClick={async () => {
+                        setWalletConnecting(true);
+                        setConnectingWalletType(w.name);
+                        
+                        setTimeout(async () => {
+                          const mockAddress = '0x71C2c253457a48d9489A1Db475De495632aC3A90';
+                          localStorage.setItem('aurex_wallet_address', mockAddress);
+                          setWalletAddress(mockAddress);
+                          setWalletConnecting(false);
+                          setWalletModalOpen(false);
+                          
+                          try {
+                            await api.updateProfile({ walletAddress: mockAddress }, isLiveMode);
+                            triggerRefresh();
+                          } catch (err) {
+                            console.error('Failed to sync wallet address to DB:', err);
+                          }
+                        }, 1500);
+                      }}
+                      className="btn"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '14px 18px',
+                        borderRadius: '10px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid var(--border-grey)',
+                        color: 'var(--text-white)',
+                        fontWeight: 600,
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ fontSize: '18px' }}>{w.icon}</span>
+                        {w.name}
+                      </span>
+                      <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>DETECTED</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
