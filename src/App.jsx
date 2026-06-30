@@ -248,9 +248,13 @@ export default function App() {
 
 
 
-  // Sync profile details when refresh trigger fires
+  // Sync profile details when refresh trigger fires or user changes
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setWalletAddress('');
+      localStorage.removeItem('aurex_wallet_address');
+      return;
+    }
     const syncProfile = async () => {
       try {
         const profile = await api.getProfile(user.userId, isLiveMode);
@@ -259,6 +263,9 @@ export default function App() {
           if (profile.walletAddress) {
             setWalletAddress(profile.walletAddress);
             localStorage.setItem('aurex_wallet_address', profile.walletAddress);
+          } else {
+            setWalletAddress('');
+            localStorage.removeItem('aurex_wallet_address');
           }
         }
       } catch (err) {
@@ -266,7 +273,7 @@ export default function App() {
       }
     };
     syncProfile();
-  }, [refreshTrigger, isLiveMode]);
+  }, [refreshTrigger, isLiveMode, user?.userId]);
 
   const handleAuthSuccess = (authenticatedUser) => {
     setUser(authenticatedUser);
@@ -1049,7 +1056,8 @@ export default function App() {
                             // Mock connection fallback only if no window.ethereum is found
                             alert(`${w.name} extension not detected. Sandbox mock connection will be used for testing.`);
                             setTimeout(async () => {
-                              const mockAddress = '0x71C2c253457a48d9489A1Db475De495632aC3A90';
+                              const hashPart = user?.userId ? user.userId.toLowerCase().padEnd(8, '0') : Math.random().toString(16).slice(2, 10);
+                              const mockAddress = `0x${hashPart}7a48d9489A1Db475De495632aC3A90`.toLowerCase().slice(0, 42);
                               localStorage.setItem('aurex_wallet_address', mockAddress);
                               setWalletAddress(mockAddress);
                               setWalletConnecting(false);
