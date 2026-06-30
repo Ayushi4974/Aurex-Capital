@@ -1003,20 +1003,33 @@ export default function App() {
                         setWalletConnecting(true);
                         setConnectingWalletType(w.name);
                         
-                        setTimeout(async () => {
-                          const mockAddress = '0x71C2c253457a48d9489A1Db475De495632aC3A90';
-                          localStorage.setItem('aurex_wallet_address', mockAddress);
-                          setWalletAddress(mockAddress);
+                        try {
+                          if (typeof window !== 'undefined' && window.ethereum) {
+                            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                            if (accounts && accounts.length > 0) {
+                              const realAddress = accounts[0];
+                              localStorage.setItem('aurex_wallet_address', realAddress);
+                              setWalletAddress(realAddress);
+                              
+                              try {
+                                await api.updateProfile({ walletAddress: realAddress }, isLiveMode);
+                                triggerRefresh();
+                              } catch (errDb) {
+                                console.error('Failed to sync wallet address to DB:', errDb);
+                              }
+                            } else {
+                              alert('No accounts returned from wallet provider.');
+                            }
+                          } else {
+                            alert(`${w.name} extension not detected. Please install the ${w.name} extension to connect your real wallet.`);
+                          }
+                        } catch (err) {
+                          console.error('Failed to connect real wallet:', err);
+                          alert(err.message || 'Failed to connect real wallet.');
+                        } finally {
                           setWalletConnecting(false);
                           setWalletModalOpen(false);
-                          
-                          try {
-                            await api.updateProfile({ walletAddress: mockAddress }, isLiveMode);
-                            triggerRefresh();
-                          } catch (err) {
-                            console.error('Failed to sync wallet address to DB:', err);
-                          }
-                        }, 1500);
+                        }
                       }}
                       className="btn"
                       style={{
