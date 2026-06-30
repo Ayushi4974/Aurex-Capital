@@ -5,7 +5,7 @@ import { api } from '../utils/api';
 import { getFTPSlab, getNexusPackageName } from '../utils/simDb';
 import confetti from 'canvas-confetti';
 
-export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger }) {
+export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger, web3Balance }) {
   const [wallet, setWallet] = useState({ captok: { main: 0 } });
   const [stakes, setStakes] = useState([]);
   const [planType, setPlanType] = useState('FTP');
@@ -408,7 +408,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
                     }}
                   >
                     <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-white)' }}>Web3 Wallet</div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>MetaMask / Connected</div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>Bal: {web3Balance}</div>
                   </div>
                 </div>
               </div>

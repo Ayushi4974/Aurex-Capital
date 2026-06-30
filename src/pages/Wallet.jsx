@@ -20,7 +20,7 @@ const INCOME_CARDS = [
   { key: 'loyalty',     label: 'Loyalty Bonus',       icon: Heart,          color: '#f87171', bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.2)' },
 ];
 
-export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger }) {
+export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger, web3Balance }) {
   const [wallet, setWallet]           = useState({ captok: { main: 0 }, protok: { profit: 0 } });
   const [amount, setAmount]           = useState('');
   const [address, setAddress]         = useState('');
@@ -693,11 +693,21 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
                 </div>
               </div>
 
-              <div style={{ marginBottom: '24px', padding: '14px', background: 'rgba(212,175,55,0.03)', border: '1px solid rgba(212,175,55,0.1)', borderRadius: '8px' }}>
-                <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '4px' }}>CONNECTED WEB3 ADDRESS</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-white)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
-                  {localStorage.getItem('aurex_wallet_address') || 'Not connected. Connect wallet from header to enable automatic payments.'}
-                </span>
+              <div style={{ marginBottom: '24px', padding: '14px', background: 'rgba(212,175,55,0.03)', border: '1px solid rgba(212,175,55,0.1)', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div>
+                  <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '4px' }}>CONNECTED WEB3 ADDRESS</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-white)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    {localStorage.getItem('aurex_wallet_address') || 'Not connected. Connect wallet from header to enable automatic payments.'}
+                  </span>
+                </div>
+                {localStorage.getItem('aurex_wallet_address') && (
+                  <div style={{ borderTop: '1px solid rgba(212,175,55,0.1)', paddingTop: '8px' }}>
+                    <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '4px' }}>CONNECTED WALLET BALANCE</span>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#34d399', fontFamily: 'var(--font-display)' }}>
+                      {web3Balance}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {localStorage.getItem('aurex_wallet_address') ? (
