@@ -66,6 +66,11 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
   const [liveTickerMsg, setLiveTickerMsg] = useState('Aurex Capital node consensus synchronization: 100% OK.');
   const [flipIdx, setFlipIdx] = useState(0);
 
+  // Notification states
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
+
   // Stagger variants for hero cards entrance
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -187,6 +192,17 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
         // Fetch announcements
         const ann = localStorage.getItem('aurex_announcement') || 'Welcome to Aurex Capital! Build your Nexus downline networks today.';
         setAnnouncementText(ann);
+
+        // Fetch notifications
+        try {
+          const res = await api.getNotifications(isLiveMode);
+          if (res && res.success) {
+            setNotifications(res.notifications);
+            setUnreadCount(res.unread || 0);
+          }
+        } catch (errNotif) {
+          console.error('Error fetching notifications:', errNotif);
+        }
 
         // Construct ROI Chart Data
         const roiTxs = [...txs]
@@ -341,15 +357,101 @@ export default function Dashboard({ user, isLiveMode, onNavigate, refreshTrigger
               Secure unilevel downline portals and premium cryptocurrency investment packages dashboard.
             </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', position: 'relative' }}>
             <motion.div 
               whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 10, 0] }}
               transition={{ duration: 0.5 }}
+              onClick={async () => {
+                setNotifOpen(!notifOpen);
+                if (!notifOpen) {
+                  setUnreadCount(0);
+                  await api.markNotificationsRead(isLiveMode);
+                }
+              }}
               style={{ position: 'relative', cursor: 'pointer', padding: '8px', borderRadius: '50%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-grey)' }}
             >
               <Bell size={18} style={{ color: 'var(--gold-primary)' }} />
-              <span style={{ position: 'absolute', top: '4px', right: '4px', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ef4444' }} />
+              {unreadCount > 0 ? (
+                <span style={{
+                  position: 'absolute', top: '-2px', right: '-2px',
+                  background: '#ef4444', color: 'white', fontSize: '9px',
+                  fontWeight: 700, borderRadius: '50%', width: '15px', height: '15px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 0 6px #ef4444'
+                }}>
+                  {unreadCount}
+                </span>
+              ) : (
+                <span style={{ position: 'absolute', top: '4px', right: '4px', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.2)' }} />
+              )}
             </motion.div>
+
+            {/* Notification Dropdown Box */}
+            <AnimatePresence>
+              {notifOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="glass-card"
+                  style={{
+                    position: 'absolute',
+                    top: '46px',
+                    right: 0,
+                    width: '320px',
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                    padding: '16px',
+                    border: '1px solid var(--border-gold)',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
+                    background: 'rgba(10, 10, 10, 0.95)',
+                    borderRadius: '12px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid var(--border-grey)', paddingBottom: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-white)' }}>Notifications</span>
+                    <button 
+                      onClick={() => setNotifOpen(false)}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--text-grey)', cursor: 'pointer', fontSize: '12px' }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {notifications.length > 0 ? (
+                      notifications.map((n, i) => (
+                        <div 
+                          key={n._id || i}
+                          style={{
+                            padding: '10px',
+                            borderRadius: '8px',
+                            background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(212,175,55,0.04)',
+                            borderLeft: `3px solid ${n.read ? 'transparent' : 'var(--gold-primary)'}`,
+                            fontSize: '11px',
+                            color: 'var(--text-grey)',
+                            transition: 'all 0.2s',
+                            textAlign: 'left'
+                          }}
+                        >
+                          <div style={{ fontWeight: 700, color: 'var(--text-white)', marginBottom: '3px' }}>{n.title}</div>
+                          <div style={{ color: 'var(--text-grey)', lineHeight: 1.4 }}>{n.message}</div>
+                          <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            {new Date(n.createdAt || n.date || Date.now()).toLocaleString()}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '20px 0', fontSize: '12px' }}>
+                        No new notifications.
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>
               USER ID: {user.userId}
             </span>

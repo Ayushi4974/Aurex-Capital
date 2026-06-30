@@ -203,6 +203,25 @@ export const api = {
     }
   },
 
+  depositWeb3: async (userId, amount, txHash, isLive) => {
+    if (isLive) {
+      try {
+        const res = await client.post('/wallet/deposit-web3', { amount, txHash });
+        return res.data;
+      } catch (err) {
+        throw new Error(err.response?.data?.message || 'Web3 deposit failed');
+      }
+    } else {
+      const users = JSON.parse(localStorage.getItem('aurex_users') || '[]');
+      const idx = users.findIndex(u => u.userId === userId);
+      if (idx !== -1) {
+        users[idx].wallet.captok.main += amount;
+        localStorage.setItem('aurex_users', JSON.stringify(users));
+      }
+      return { success: true, message: `USDT deposit of $${amount} simulated successfully via Web3.` };
+    }
+  },
+
   buyImx: async (userId, amount, isLive) => {
     if (isLive) {
       try {
@@ -328,6 +347,37 @@ export const api = {
       return res.data;
     } else {
       return sim.dbDeclarePSP(percentage);
+    }
+  },
+
+  getNotifications: async (isLive) => {
+    if (isLive) {
+      try {
+        const res = await client.get('/user/notifications');
+        return res.data;
+      } catch (err) {
+        return { success: false, notifications: [] };
+      }
+    } else {
+      const notifications = JSON.parse(localStorage.getItem('aurex_notifications') || '[]');
+      const unread = notifications.filter(n => !n.read).length;
+      return { success: true, notifications, unread };
+    }
+  },
+
+  markNotificationsRead: async (isLive) => {
+    if (isLive) {
+      try {
+        const res = await client.put('/user/notifications/read');
+        return res.data;
+      } catch (err) {
+        return { success: false };
+      }
+    } else {
+      const notifications = JSON.parse(localStorage.getItem('aurex_notifications') || '[]');
+      notifications.forEach(n => n.read = true);
+      localStorage.setItem('aurex_notifications', JSON.stringify(notifications));
+      return { success: true };
     }
   }
 };

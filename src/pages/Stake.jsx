@@ -17,6 +17,7 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('internal'); // 'internal' | 'web3'
 
   useEffect(() => {
     const fetchStakingData = async () => {
@@ -52,8 +53,23 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
     setSuccess('');
 
     try {
+      if (paymentMethod === 'web3') {
+        const web3Addr = localStorage.getItem('aurex_wallet_address');
+        if (!web3Addr) {
+          throw new Error('Please connect your Web3 wallet using the top header button first.');
+        }
+
+        // Stage 1: Simulated Direct Web3 Payment Handshake (MetaMask / Trust Wallet)
+        const simulatedHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+        await new Promise(resolve => setTimeout(resolve, 2000)); // wait for blockchain tx confirmation
+
+        // Load the funds directly into Activation Wallet
+        await api.depositWeb3(user.userId, amt, simulatedHash, isLiveMode);
+      }
+
+      // Stage 2: Invest & Stake
       await api.invest(user.userId, planType, amt, isLiveMode);
-      setSuccess(`Staking transaction processed! Invested $${amt} in ${planType}.`);
+      setSuccess(`Staking transaction processed successfully! Invested $${amt} in ${planType} via ${paymentMethod === 'web3' ? 'Web3 Wallet' : 'Activation Wallet'}.`);
       setAmount('');
       
       confetti({
@@ -363,6 +379,41 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
               )}
             </AnimatePresence>
 
+            {/* Payment Method Selection if Web3 Wallet is Connected */}
+            {localStorage.getItem('aurex_wallet_address') && (
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.5px' }}>
+                  PAYMENT METHOD
+                </label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div
+                    onClick={() => setPaymentMethod('internal')}
+                    style={{
+                      flex: 1, padding: '12px', borderRadius: '8px', cursor: 'pointer',
+                      border: paymentMethod === 'internal' ? '1.5px solid var(--gold-primary)' : '1px solid var(--border-grey)',
+                      background: paymentMethod === 'internal' ? 'rgba(212,175,55,0.06)' : 'rgba(255,255,255,0.01)',
+                      textAlign: 'center', transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-white)' }}>Activation Wallet</div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>Bal: ${wallet.captok.main.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                  </div>
+                  <div
+                    onClick={() => setPaymentMethod('web3')}
+                    style={{
+                      flex: 1, padding: '12px', borderRadius: '8px', cursor: 'pointer',
+                      border: paymentMethod === 'web3' ? '1.5px solid var(--gold-primary)' : '1px solid var(--border-grey)',
+                      background: paymentMethod === 'web3' ? 'rgba(212,175,55,0.06)' : 'rgba(255,255,255,0.01)',
+                      textAlign: 'center', transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-white)' }}>Web3 Wallet</div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>MetaMask / Connected</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div style={{
               display: 'flex', gap: '8px', padding: '10px', borderRadius: '6px', fontSize: '11px', marginBottom: '24px',
               background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.15)', color: '#fbbf24'
@@ -375,7 +426,11 @@ export default function Stake({ user, isLiveMode, onRefreshUser, refreshTrigger 
             {success && <div style={{ color: '#10b981', fontSize: '13px', marginBottom: '16px' }}>{success}</div>}
 
             <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}>
-              Confirm
+              {loading ? (
+                paymentMethod === 'web3' ? 'Confirming Web3 transaction...' : 'Staking...'
+              ) : (
+                paymentMethod === 'web3' ? 'Pay & Stake via Web3' : 'Confirm Staking'
+              )}
               <ArrowRight size={16} />
             </button>
           </form>

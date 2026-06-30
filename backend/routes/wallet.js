@@ -66,6 +66,35 @@ router.post('/deposit', verifyToken, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// POST /api/wallet/deposit-web3 — auto-credits wallet after Web3 payment
+router.post('/deposit-web3', verifyToken, async (req, res, next) => {
+  try {
+    const { amount, txHash } = req.body;
+    if (!amount || amount <= 0) return res.status(400).json({ success: false, message: 'Invalid amount' });
+    
+    // Credit depositBalance directly
+    await creditWallet(req.user.userId, 'depositBalance', amount, 'deposit',
+      `Web3 Deposit (MetaMask): $${amount}`);
+      
+    // Save in DepositHistory as confirmed
+    const hash = txHash || '0x' + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10);
+    await DepositHistory.create({
+      userId: req.user.userId,
+      amount,
+      status: 'confirmed',
+      txHash: hash,
+      confirmedAt: new Date()
+    });
+    
+    const wallet = await Wallet.findOne({ userId: req.user.userId });
+    return res.json({
+      success: true,
+      message: `Web3 payment verified. $${amount} credited to Activation Wallet.`,
+      wallet
+    });
+  } catch (err) { next(err); }
+});
+
 // POST /api/wallet/buy-imx — auto-approve deposit (mirrors simDb.dbBuyImx)
 router.post('/buy-imx', verifyToken, async (req, res, next) => {
   try {

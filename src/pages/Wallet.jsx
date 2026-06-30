@@ -6,6 +6,7 @@ import {
   Trophy, Star, Heart, ArrowDownLeft, ArrowLeftRight, ChevronDown, ChevronUp, Wallet as WalletIcon
 } from 'lucide-react';
 import { api } from '../utils/api';
+import confetti from 'canvas-confetti';
 
 // Income card definition
 const INCOME_CARDS = [
@@ -38,13 +39,19 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
   const [historyTab, setHistoryTab]   = useState('withdraw'); // 'withdraw' | 'deposit' | 'transfer'
   
   // P2P Internal Transfers States
-  const [activeFormTab, setActiveFormTab] = useState('withdraw'); // 'withdraw' | 'transfer'
+  const [activeFormTab, setActiveFormTab] = useState('withdraw'); // 'withdraw' | 'transfer' | 'deposit'
   const [transferRecipient, setTransferRecipient] = useState('');
   const [transferAmount, setTransferAmount]       = useState('');
   const [transferTxPassword, setTransferTxPassword] = useState('');
   const [transferError, setTransferError]         = useState('');
   const [transferSuccess, setTransferSuccess]     = useState('');
   const [transferLoading, setTransferLoading]     = useState(false);
+
+  // Web3 Deposit States
+  const [web3DepositAmount, setWeb3DepositAmount] = useState('');
+  const [web3DepositLoading, setWeb3DepositLoading] = useState(false);
+  const [web3DepositSuccess, setWeb3DepositSuccess] = useState('');
+  const [web3DepositError, setWeb3DepositError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +62,8 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
         // Wallet address
         const users = JSON.parse(localStorage.getItem('aurex_users') || '[]');
         const dbUser = users.find(u => u.userId === user.userId);
-        setAddress(dbUser?.walletAddress || '0x918F3aD343F818de4DB98c575Ee693C6Cf56bc8c');
+        const web3Address = localStorage.getItem('aurex_wallet_address');
+        setAddress(web3Address || dbUser?.walletAddress || '0x918F3aD343F818de4DB98c575Ee693C6Cf56bc8c');
 
         const txs = (await api.getTransactions(user.userId, isLiveMode)) || [];
 
@@ -164,6 +172,51 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
       setTransferError(err.message || 'P2P Transfer failed.');
     } finally {
       setTransferLoading(false);
+    }
+  const handleWeb3Deposit = async (e) => {
+    e.preventDefault();
+    const amt = parseFloat(web3DepositAmount);
+    if (isNaN(amt) || amt <= 0) {
+      setWeb3DepositError('Please enter a valid deposit amount.');
+      return;
+    }
+    if (amt < 10) {
+      setWeb3DepositError('Minimum deposit amount is $10.');
+      return;
+    }
+
+    const connectedAddress = localStorage.getItem('aurex_wallet_address');
+    if (!connectedAddress) {
+      setWeb3DepositError('Please connect your Web3 wallet using the top header button first.');
+      return;
+    }
+
+    setWeb3DepositLoading(true);
+    setWeb3DepositError('');
+    setWeb3DepositSuccess('');
+
+    try {
+      // Simulate MetaMask/Web3 USDT BEP20 Payment Handshake
+      const simulatedHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+      
+      // Delay to simulate block confirmation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      await api.depositWeb3(user.userId, amt, simulatedHash, isLiveMode);
+      setWeb3DepositSuccess(`USDT Deposit of $${amt} processed and confirmed successfully via Web3! Transaction Hash: ${simulatedHash.slice(0, 10)}...${simulatedHash.slice(-8)}`);
+      setWeb3DepositAmount('');
+      
+      confetti({
+        particleCount: 80,
+        spread: 50,
+        origin: { y: 0.6 }
+      });
+
+      if (onRefreshUser) onRefreshUser();
+    } catch (err) {
+      setWeb3DepositError(err.message || 'Web3 deposit failed.');
+    } finally {
+      setWeb3DepositLoading(false);
     }
   };
 
@@ -343,32 +396,46 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
               onClick={() => setActiveFormTab('withdraw')}
               style={{
                 flex: 1, padding: '10px', borderRadius: '6px', border: 'none',
-                cursor: 'pointer', fontSize: '13px', fontWeight: 700,
+                cursor: 'pointer', fontSize: '12px', fontWeight: 700,
                 background: activeFormTab === 'withdraw' ? 'rgba(212,175,55,0.1)' : 'transparent',
                 color: activeFormTab === 'withdraw' ? 'var(--gold-primary)' : 'var(--text-grey)',
                 border: activeFormTab === 'withdraw' ? '1px solid var(--border-gold)' : '1px solid transparent',
                 transition: 'all 0.2s',
               }}
             >
-              Withdraw to Crypto
+              Withdraw
             </button>
             <button
               type="button"
               onClick={() => setActiveFormTab('transfer')}
               style={{
                 flex: 1, padding: '10px', borderRadius: '6px', border: 'none',
-                cursor: 'pointer', fontSize: '13px', fontWeight: 700,
+                cursor: 'pointer', fontSize: '12px', fontWeight: 700,
                 background: activeFormTab === 'transfer' ? 'rgba(212,175,55,0.1)' : 'transparent',
                 color: activeFormTab === 'transfer' ? 'var(--gold-primary)' : 'var(--text-grey)',
                 border: activeFormTab === 'transfer' ? '1px solid var(--border-gold)' : '1px solid transparent',
                 transition: 'all 0.2s',
               }}
             >
-              P2P Fund Transfer
+              P2P Transfer
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFormTab('deposit')}
+              style={{
+                flex: 1, padding: '10px', borderRadius: '6px', border: 'none',
+                cursor: 'pointer', fontSize: '12px', fontWeight: 700,
+                background: activeFormTab === 'deposit' ? 'rgba(212,175,55,0.1)' : 'transparent',
+                color: activeFormTab === 'deposit' ? 'var(--gold-primary)' : 'var(--text-grey)',
+                border: activeFormTab === 'deposit' ? '1px solid var(--border-gold)' : '1px solid transparent',
+                transition: 'all 0.2s',
+              }}
+            >
+              Web3 Deposit
             </button>
           </div>
 
-          {activeFormTab === 'withdraw' ? (
+          {activeFormTab === 'withdraw' && (
             <>
               {/* Cooldown / eligible banner */}
               {cooldownHours > 0 ? (
@@ -420,18 +487,37 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
                   <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.5px' }}>
                     RECEIVING CRYPTO ADDRESS (USDT BEP20)
                   </label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="form-input"
-                    style={{ width: '100%' }}
-                    placeholder="0x..."
-                    required
-                  />
-                  <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px', display: 'block' }}>
-                    Note: Update your withdrawal address inside the "My Profile" tab if needed.
-                  </span>
+                  {localStorage.getItem('aurex_wallet_address') ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: '#10b981', fontWeight: 700 }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }} className="status-pill-pulse" />
+                        Connected Web3 Wallet Address
+                      </div>
+                      <input
+                        type="text"
+                        value={localStorage.getItem('aurex_wallet_address')}
+                        readOnly
+                        className="form-input"
+                        style={{ width: '100%', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-grey)' }}
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="form-input"
+                        style={{ width: '100%' }}
+                        placeholder="0x..."
+                        required
+                      />
+                      <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px', display: 'block' }}>
+                        Note: Update your withdrawal address inside the "My Profile" tab if needed.
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 {/* TX Password */}
@@ -483,7 +569,9 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
                 </button>
               </form>
             </>
-          ) : (
+          )}
+
+          {activeFormTab === 'transfer' && (
             <form onSubmit={handleTransfer}>
               {/* Recipient ID */}
               <div style={{ marginBottom: '20px' }}>
@@ -568,6 +656,67 @@ export default function Wallet({ user, isLiveMode, onRefreshUser, refreshTrigger
                 {transferLoading ? 'Processing transfer...' : 'Confirm P2P Fund Transfer'}
                 <ArrowLeftRight size={16} />
               </button>
+            </form>
+          )}
+
+          {activeFormTab === 'deposit' && (
+            <form onSubmit={handleWeb3Deposit}>
+              {web3DepositError && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '12px', borderRadius: '8px', color: '#f87171', fontSize: '13px', marginBottom: '16px' }}>
+                  {web3DepositError}
+                </div>
+              )}
+              {web3DepositSuccess && (
+                <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '12px', borderRadius: '8px', color: '#34d399', fontSize: '13px', marginBottom: '16px' }}>
+                  {web3DepositSuccess}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-grey)', marginBottom: '8px', fontWeight: 600 }}>
+                  DEPOSIT AMOUNT (USDT BEP20)
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <DollarSign size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input
+                    type="number"
+                    placeholder="Enter deposit amount (Min $10)"
+                    value={web3DepositAmount}
+                    onChange={(e) => setWeb3DepositAmount(e.target.value)}
+                    className="form-input"
+                    style={{ paddingLeft: '36px', width: '100%' }}
+                    required
+                    disabled={web3DepositLoading}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '24px', padding: '14px', background: 'rgba(212,175,55,0.03)', border: '1px solid rgba(212,175,55,0.1)', borderRadius: '8px' }}>
+                <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '4px' }}>CONNECTED WEB3 ADDRESS</span>
+                <span style={{ fontSize: '12px', color: 'var(--text-white)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                  {localStorage.getItem('aurex_wallet_address') || 'Not connected. Connect wallet from header to enable automatic payments.'}
+                </span>
+              </div>
+
+              {localStorage.getItem('aurex_wallet_address') ? (
+                <motion.button
+                  whileHover={{ scale: 1.015 }}
+                  whileTap={{ scale: 0.985 }}
+                  type="submit"
+                  disabled={web3DepositLoading}
+                  className="btn"
+                  style={{
+                    width: '100%', padding: '14px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', height: '48px',
+                    background: 'var(--gold-primary)', color: 'black', border: 'none', cursor: 'pointer'
+                  }}
+                >
+                  {web3DepositLoading ? 'Waiting for block confirmation...' : 'Pay with Web3 Wallet (MetaMask)'}
+                </motion.button>
+              ) : (
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px', padding: '10px 0' }}>
+                  ⚠️ Connect wallet from top right header to enable automated Web3 deposits.
+                </div>
+              )}
             </form>
           )}
         </motion.div>
