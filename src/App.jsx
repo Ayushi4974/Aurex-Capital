@@ -1063,12 +1063,24 @@ export default function App() {
                               }
                             }, 1000);
                           }
-                        } catch (err) {
-                          console.error('Wallet connection error:', err);
-                          alert(err.message || 'Failed to connect Web3 wallet.');
-                          setWalletConnecting(false);
-                        }
-                      }}
+                         } catch (err) {
+                           console.error('Wallet connection error:', err);
+                           const errMsg = err.message || '';
+                           if (errMsg.toLowerCase().includes('active wallet') || errMsg.toLowerCase().includes('no accounts') || errMsg.toLowerCase().includes('returned')) {
+                             alert(
+                               'No Active Wallet Found!\n\n' +
+                               'Please open your MetaMask extension and create/import an account first. Make sure MetaMask is unlocked and you have active accounts selected.'
+                             );
+                           } else if (errMsg.toLowerCase().includes('user rejected') || errMsg.toLowerCase().includes('rejected')) {
+                             alert('Connection request rejected by user. Please approve the connection in MetaMask.');
+                           } else if (errMsg.toLowerCase().includes('already pending')) {
+                             alert('A connection request is already pending in MetaMask. Please open your extension and approve it.');
+                           } else {
+                             alert(err.message || 'Failed to connect Web3 wallet.');
+                           }
+                           setWalletConnecting(false);
+                         }
+                       }}
                       className="btn"
                       style={{
                         display: 'flex',
